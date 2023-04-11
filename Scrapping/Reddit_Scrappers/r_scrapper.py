@@ -25,21 +25,19 @@ def getPushshiftData():
     return posts["data"]
 
 
-def get_post_with_id():
-    post_id = "125udaj"  # Replace with the ID of the post you are looking for
-
+def get_post_with_id(post_id="125udaj"):
     url = f"https://api.pushshift.io/reddit/submission/search/?ids={post_id}"
     response = requests.get(url)
-
+    post = None
     if response.status_code == 200:
         data = json.loads(response.text)
         if data["data"]:
             post = data["data"][0]  # The first item in the "data" array contains the post data
-            print(post)
         else:
             print("Post not found")
     else:
         print(f"Error: {response.status_code}")
+    return post
 
 
 # Getting submission ids for 6 hour time interval for a give date range
@@ -226,6 +224,7 @@ if __name__ == "__main__":
     # get_post_with_id()
     # get_submissions_records_for_time_range("2020-12-01", "2021-01-01", "health", "covid")
     # retrieve_comments_ids_per_submission()
-    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\r_health_submission_records")
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\r_health_submission_records")
+    b = get_post_with_id("119wltg")
     print()
 
