@@ -7,11 +7,11 @@ import datetime
 import praw
 from dateutil.relativedelta import relativedelta
 from Tool_Pack import tools
+from prawcore.exceptions import Forbidden
 
 
 reddit = praw.Reddit(client_id="JA5vOF4gOhcjuGqdHU2Gcw", client_secret="3XT735o7Yc5dPql4EG9ThcqVgzrPZw",
                      user_agent="Climate_Change")
-
 
 def getPushshiftData():
     url = " https://api.pushshift.io/reddit/search/submission/?limit=1000&q=trump&after=1514764800&before=1517443200&subreddit=politics"
@@ -53,14 +53,14 @@ def get_submissions_records_for_time_range(start_date_str, end_date_str, subredd
 
     url_template = "https://api.pushshift.io/reddit/search/submission/?size={}&after={}&before={}&subreddit={}"
     if query is not None:
-        url_template += "q=" + query
+        url_template += "&q=" + query
 
     submission_records = list()
 
     # Send requests to API in batches until all submissions have been retrieved
     while earlier_date <= end_date_obj:
         # pushshift allows 1 request per second but let don't strain their system.
-        time.sleep(5)
+        time.sleep(1.1)
         # Construct the URL for the API endpoint with the current pagination parameters
         url = url_template.format(batch_size, date_converter(earlier_date), date_converter(later_date), subreddit_name)
 
@@ -133,8 +133,8 @@ def get_submissions_records_for_time_range(start_date_str, end_date_str, subredd
         print(earlier_date)
         earlier_date = later_date
         later_date += relativedelta(hours=hour_interval)
-    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\\"
-                      + subreddit_name + "submission_records", submission_records)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\r_"
+                      + subreddit_name + "_submission_records", submission_records)
 
 
 def date_converter(date_obj):
@@ -143,8 +143,10 @@ def date_converter(date_obj):
 
 
 def retrieve_comments_ids_per_submission():
-    period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Twitter_Parser\I_O\\"
-                                       r"Politics\January_6_United_States_Capitol_attack\submission_records")
+    # period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Twitter_Parser\I_O\\"
+    #                                    r"Politics\January_6_United_States_Capitol_attack\submission_records")
+    period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\\"
+                                       r"r_science_submission_records")
 
     # TODO change that to zero when starting the scraper
     idx_correction = 0
@@ -152,12 +154,15 @@ def retrieve_comments_ids_per_submission():
     for idx, sub_record in enumerate(period_records[idx_correction:]):
         if (idx + idx_correction) % 10 == 0:
             print("Saved until idx:" + str(idx + idx_correction))
-            tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Twitter_Parser\I_O\Politics\\"
-                              r"January 6 United States Capitol attack\Comments\submission_id_to_comments_dict"
+            tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\\"
+                              r"Comments\submission_id_to_comments_dict"
                               + str(idx + idx_correction), submission_id_to_comments_dict)
             submission_id_to_comments_dict = dict()
         comment_list = list()
-        submission = reddit.submission(sub_record["id"])
+        try:
+            submission = reddit.submission(sub_record["id"])
+        except Forbidden as f_error:
+            print(f_error)
         # submission.comments.replace_more(limit=None, threshold=0)
         for comment in submission.comments.list():
             comment_record_dict = dict()
@@ -219,7 +224,8 @@ def retrieve_comments_ids_per_submission():
 if __name__ == "__main__":
     # getPushshiftData()
     # get_post_with_id()
-    get_submissions_records_for_time_range("2020-12-01", "2020-12-31", "science", "covid")
+    # get_submissions_records_for_time_range("2020-12-01", "2021-01-01", "health", "covid")
     # retrieve_comments_ids_per_submission()
+    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\r_health_submission_records")
     print()
 
