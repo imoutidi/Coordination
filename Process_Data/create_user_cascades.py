@@ -30,7 +30,28 @@ def merge_submissions_and_comments():
                           r"Storm_on_capitol\Merged_Submissions_Comments\subs_comments_"
                           + str(idx), merged_subs_and_comments)
 
+# this will be revisited
+def scan_users():
+    records_path = r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\" \
+                   r"Storm_on_capitol\Merged_Submissions_Comments\\"
+    dictionary_of_usernames = dict()
+    for idx, record_file in enumerate(os.listdir(records_path)):
+        all_records = tools.load_pickle(records_path + record_file)
+        for current_record in all_records:
+            author = current_record[0]["author"]
+            author_fullname = current_record[0]["author_fullname"]
+            sid = current_record[0]["id"]
+            title = current_record[0]["title"]
+            selftext = current_record[0]["selftext"]
+            subreddit = current_record[0]["subreddit"]
+            dictionary_of_usernames[author_fullname] = (author, sid, title, selftext, subreddit)
+            for post_comment in current_record[1]:
+                print()
+
+        print()
+
 
 if __name__ == "__main__":
-    merge_submissions_and_comments()
+    # merge_submissions_and_comments()
+    scan_users()
     print()
