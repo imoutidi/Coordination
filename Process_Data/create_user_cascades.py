@@ -93,17 +93,27 @@ def filter_users_on_number_of_posts():
     for user_tuple in users_posts_sorted:
         if user_tuple[1] > 20:
             frequent_posters.append(user_tuple)
+    # for each frequent user get his posts and sort them based on their timestamp, older to newer.
+    frequent_users_with_posts = list()
+    for frequent_user in frequent_posters:
+        sorted_user_posts = users_dict[frequent_user[0]]
+        sorted_user_posts = sorted(sorted_user_posts, key=itemgetter("timestamp"))
+        frequent_users_with_posts.append((frequent_user, sorted_user_posts))
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+                      r"Datasets\Storm_on_capitol\Users\frequent_users_and_their_posts", frequent_users_with_posts)
 
 
+def check_for_agreement_keywords():
+    frequent_users_with_posts = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+                                                  r"Datasets\Storm_on_capitol\Users\frequent_users_and_their_posts")
     print()
-
 
 
 
 if __name__ == "__main__":
     # merge_submissions_and_comments()
     # scan_users()
-    filter_users_on_number_of_posts()
-
-
+    # filter_users_on_number_of_posts()
+    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+                      r"Datasets\Storm_on_capitol\Users\frequent_users_and_their_posts")
     print()
