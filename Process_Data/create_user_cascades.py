@@ -1,6 +1,4 @@
 import os
-
-import Tools.scripts.generate_token
 from dateutil.relativedelta import relativedelta
 from Tool_Pack import tools
 from operator import itemgetter
@@ -32,6 +30,38 @@ def merge_submissions_and_comments():
         tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                           r"Storm_on_capitol\Merged_Submissions_Comments\subs_comments_"
                           + str(idx), merged_subs_and_comments)
+
+
+def create_comments_index():
+    list_of_irrelevant_usernames = ["t2_6l4z3", "t2_onl9u", "N_A"]
+    records_path = r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\" \
+                   r"Storm_on_capitol\Merged_Submissions_Comments\\"
+    comments_dict = dict()
+    for idx, record_file in enumerate(os.listdir(records_path)):
+        print(idx)
+        all_records = tools.load_pickle(records_path + record_file)
+        for current_record in all_records:
+            sid = current_record[0]["id"]
+            for post_comment in current_record[1]:
+                if post_comment["author_fullname"] in list_of_irrelevant_usernames:
+                    continue
+                c_author = post_comment["author"].name
+                c_author_fullname = post_comment["author_fullname"]
+                c_sid = post_comment["id"]
+                c_body = post_comment["body"]
+                c_subreddit = post_comment["subreddit"]
+                c_timestamp = int(post_comment["created_utc"])
+                c_score = post_comment["score"]
+                c_perma = post_comment["permalink"]
+                c_parent_id = post_comment["parent_id"]
+                c_snapshot_dict = {"author": c_author, "author_fullname": c_author_fullname, "post_id": sid,
+                                   "body": c_body, "subreddit": c_subreddit, "timestamp": c_timestamp,
+                                   "score": c_score, "parent_id": c_parent_id, "permalink": c_perma}
+                comments_dict[c_sid] = c_snapshot_dict
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                      r"Storm_on_capitol\Indexes\comments_index"
+                      , comments_dict)
+
 
 def scan_users():
     list_of_irrelevant_usernames = ["t2_6l4z3", "t2_onl9u", "N_A"]
@@ -68,22 +98,24 @@ def scan_users():
                 c_subreddit = post_comment["subreddit"]
                 c_timestamp = int(post_comment["created_utc"])
                 c_score = post_comment["score"]
+                c_perma = post_comment["permalink"]
                 c_parent_id = post_comment["parent_id"]
-                c_snapshot_dict = {"author": c_author, "id": c_sid, "body": c_body, "subreddit": c_subreddit,
-                                   "timestamp": c_timestamp, "score": c_score, "parent_id": c_parent_id}
+                c_snapshot_dict = {"author": c_author, "comment_id": c_sid, "post_id": sid, "body": c_body,
+                                   "subreddit": c_subreddit, "timestamp": c_timestamp, "score": c_score,
+                                   "parent_id": c_parent_id, "permalink": c_perma}
                 if c_author_fullname in dictionary_of_usernames:
                     dictionary_of_usernames[c_author_fullname].append(c_snapshot_dict)
                 else:
                     dictionary_of_usernames[c_author_fullname] = list()
                     dictionary_of_usernames[c_author_fullname].append(c_snapshot_dict)
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                      r"Storm_on_capitol\Posts_Indexed_per_User\posts_per_user_merged"
+                      r"Storm_on_capitol\Indexes\posts_per_user_merged"
                       , dictionary_of_usernames)
 
 
 def filter_users_on_number_of_posts():
     users_dict = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\\"
-                                   r"Posts_Indexed_per_User\posts_per_user_merged")
+                                   r"Indexes\posts_per_user_merged")
     users_posts_list = list()
     for user_id in users_dict:
         users_posts_list.append((user_id, len(users_dict[user_id])))
@@ -104,16 +136,35 @@ def filter_users_on_number_of_posts():
 
 
 def check_for_agreement_keywords():
+    key_phrase_to_opinion_comment = defaultdict(list)
     frequent_users_with_posts = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
                                                   r"Datasets\Storm_on_capitol\Users\frequent_users_and_their_posts")
-    print()
+    comments_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                       r"Storm_on_capitol\Indexes\comments_index")
+    agreement_key_phrases = ["i agree", "you were right", "you are right", "thats true", "that is true", "good point",
+                             "fair enough", "fair point", "you have a point", "you got a point", "excellent point",
+                             "excellent argument", "good argument", "exactly this", " +1 ", "ok got it", "got it",
+                             "i get it", "amen to that", "i see your point", "my bad", "i was wrong", "i went wrong",
+                             "you’re correct", "you are correct", "i stand corrected"]
+    for f_user_tuple in frequent_users_with_posts:
+        for u_post in f_user_tuple[1]:
+            if "body" in u_post:
+                post_text = u_post["body"].lower().replace("\n", "").strip()
+                for agree_phrase in agreement_key_phrases:
+                    if agree_phrase in post_text:
+                        # temp_agreeable_posts.append((f_user_tuple[0][0], u_post))
+                        key_phrase_to_opinion_comment[agree_phrase].append((f_user_tuple[0][0], u_post))
 
+                        # we get duplicates otherwise.
+                        # break
+    print()
 
 
 if __name__ == "__main__":
     # merge_submissions_and_comments()
     # scan_users()
     # filter_users_on_number_of_posts()
-    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
-                      r"Datasets\Storm_on_capitol\Users\frequent_users_and_their_posts")
+    # create_comments_index()
+    check_for_agreement_keywords()
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\Indexes\comments_index")
     print()

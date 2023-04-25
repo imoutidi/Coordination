@@ -141,10 +141,10 @@ def date_converter(date_obj):
 
 
 def retrieve_comments_ids_per_submission():
-    # period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Twitter_Parser\I_O\\"
-    #                                    r"Politics\January_6_United_States_Capitol_attack\submission_records")
-    period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\\"
-                                       r"r_science_submission_records")
+    period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Twitter_Parser\I_O\\"
+                                       r"Politics\January_6_United_States_Capitol_attack\submission_records")
+    # period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\\"
+    #                                    r"r_science_submission_records")
 
     # TODO change that to zero when starting the scraper
     idx_correction = 0
@@ -159,10 +159,13 @@ def retrieve_comments_ids_per_submission():
         comment_list = list()
         try:
             submission = reddit.submission(sub_record["id"])
+            print()
         except Forbidden as f_error:
             print(f_error)
         # submission.comments.replace_more(limit=None, threshold=0)
         for comment in submission.comments.list():
+            for reply in comment.replies.list():
+                print()
             comment_record_dict = dict()
             if "id" in comment.__dict__:
                 comment_record_dict["id"] = comment.__dict__["id"]
@@ -223,8 +226,8 @@ if __name__ == "__main__":
     # getPushshiftData()
     # get_post_with_id()
     # get_submissions_records_for_time_range("2020-12-01", "2021-01-01", "health", "covid")
-    # retrieve_comments_ids_per_submission()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\r_health_submission_records")
-    b = get_post_with_id("119wltg")
+    retrieve_comments_ids_per_submission()
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\Comments\submission_id_to_comments_dict10")
+    # b = get_post_with_id("119wltg")
     print()
 
