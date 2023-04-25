@@ -80,8 +80,8 @@ def scan_users():
             selftext = current_record[0]["selftext"]
             subreddit = current_record[0]["subreddit"]
             timestamp = tools.str_datetime_to_timestamp(current_record[0]["utc_datetime_str"])
-            snapshot_dict = {"author": author, "id": sid, "title": title, "selftext": selftext,
-                             "subreddit": subreddit, "timestamp": timestamp, "score": score}
+            snapshot_dict = {"author": author, "author_fullname": author_fullname,"id": sid, "title": title,
+                             "selftext": selftext, "subreddit": subreddit, "timestamp": timestamp, "score": score}
 
             if author_fullname in dictionary_of_usernames:
                 dictionary_of_usernames[author_fullname].append(snapshot_dict)
@@ -100,9 +100,9 @@ def scan_users():
                 c_score = post_comment["score"]
                 c_perma = post_comment["permalink"]
                 c_parent_id = post_comment["parent_id"]
-                c_snapshot_dict = {"author": c_author, "comment_id": c_sid, "post_id": sid, "body": c_body,
-                                   "subreddit": c_subreddit, "timestamp": c_timestamp, "score": c_score,
-                                   "parent_id": c_parent_id, "permalink": c_perma}
+                c_snapshot_dict = {"author": c_author, "author_fullname": c_author_fullname, "comment_id": c_sid,
+                                   "post_id": sid, "body": c_body, "subreddit": c_subreddit, "timestamp": c_timestamp,
+                                   "score": c_score, "parent_id": c_parent_id, "permalink": c_perma}
                 if c_author_fullname in dictionary_of_usernames:
                     dictionary_of_usernames[c_author_fullname].append(c_snapshot_dict)
                 else:
@@ -135,12 +135,29 @@ def filter_users_on_number_of_posts():
                       r"Datasets\Storm_on_capitol\Users\frequent_users_and_their_posts", frequent_users_with_posts)
 
 
+def create_submission_index():
+    submissions_path = r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\" \
+                       r"Storm_on_capitol\Merged_Submissions_Comments\\"
+    submissions_index = dict()
+    for idx, sub_file in enumerate(os.listdir(submissions_path)):
+        print(idx)
+        all_submissions = tools.load_pickle(submissions_path + sub_file)
+        for sub in all_submissions:
+            submissions_index[sub[0]["id"]] = sub
+        tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                          r"Storm_on_capitol\Indexes\submissions_index", submissions_index)
+
+
 def check_for_agreement_keywords():
+    posts_per_user = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+                                       r"Datasets\Storm_on_capitol\Indexes\posts_per_user_merged")
     key_phrase_to_opinion_comment = defaultdict(list)
+    user_cascades = list()
+    cascades_username_tracker = set()
     frequent_users_with_posts = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
                                                   r"Datasets\Storm_on_capitol\Users\frequent_users_and_their_posts")
-    comments_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                                       r"Storm_on_capitol\Indexes\comments_index")
+    submission_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                         r"Storm_on_capitol\Indexes\submissions_index")
     agreement_key_phrases = ["i agree", "you were right", "you are right", "thats true", "that is true", "good point",
                              "fair enough", "fair point", "you have a point", "you got a point", "excellent point",
                              "excellent argument", "good argument", "exactly this", " +1 ", "ok got it", "got it",
@@ -148,16 +165,49 @@ def check_for_agreement_keywords():
                              "you’re correct", "you are correct", "i stand corrected"]
     for f_user_tuple in frequent_users_with_posts:
         for u_post in f_user_tuple[1]:
+            # body means it is a comment.
             if "body" in u_post:
                 post_text = u_post["body"].lower().replace("\n", "").strip()
                 for agree_phrase in agreement_key_phrases:
                     if agree_phrase in post_text:
                         # temp_agreeable_posts.append((f_user_tuple[0][0], u_post))
                         key_phrase_to_opinion_comment[agree_phrase].append((f_user_tuple[0][0], u_post))
+    for key_phrase, list_of_comments in key_phrase_to_opinion_comment.items():
+        for agree_comment in list_of_comments:
+            agree_user_cascade = posts_per_user[agree_comment[0]]
+            for idx, user_comment in enumerate(agree_user_cascade):
+                if agree_comment[1]["timestamp"] == user_comment["timestamp"]:
+                    if "key_phrase" in user_comment:
+                        user_comment["key_phrase"].append(key_phrase)
+                    else:
+                        user_comment["key_phrase"] = [key_phrase]
+                    user_comment["post_comments"] = submission_index[user_comment["post_id"]]
+            if agree_user_cascade[0]["author"] not in cascades_username_tracker:
+                cascades_username_tracker.add(agree_user_cascade[0]["author"])
+                user_cascades.append(agree_user_cascade)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                      r"Storm_on_capitol\Users\agree_user_cascades", user_cascades)
 
-                        # we get duplicates otherwise.
-                        # break
-    print()
+
+
+def check_stuff():
+    comments_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                       r"Storm_on_capitol\Indexes\comments_index")
+    total_count = 0
+    t1_count = 0
+    t2_count = 0
+    t3_count = 0
+    for comment, comment_info in comments_index.items():
+        total_count += 1
+        if comment_info["parent_id"][0:3] == "t1_":
+            t1_count += 1
+        if comment_info["parent_id"][0:3] == "t2_":
+            t2_count += 1
+        if comment_info["parent_id"][0:3] == "t3_":
+            t3_count += 1
+        # print(comment_info["parent_id"])
+    print(len(comments_index))
+    print(f"total_count = {total_count}\n t1 = {t1_count} \n t2 = {t2_count} \n t3 = {t3_count}")
 
 
 if __name__ == "__main__":
@@ -165,6 +215,10 @@ if __name__ == "__main__":
     # scan_users()
     # filter_users_on_number_of_posts()
     # create_comments_index()
+    # check_stuff()
+    # create_submission_index()
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+    #                       r"Datasets\Storm_on_capitol\Indexes\submissions_index")
     check_for_agreement_keywords()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\Indexes\comments_index")
+
     print()
