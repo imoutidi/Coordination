@@ -229,7 +229,7 @@ def check_stuff():
 def annotate():
     comment_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
                                       r"Datasets\Storm_on_capitol\Annotations\comment_index")
-    # comment_index = 0
+    # comment_index = 35
     index_counter = 0
     agree_user_cascades = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                                             r"Storm_on_capitol\Users\agree_user_cascades")
@@ -265,9 +265,10 @@ def print_with_phrase_colored(in_str):
                              "excellent argument", "good argument", "exactly this", " +1 ", "ok got it", "got it",
                              "i get it", "amen to that", "i see your point", "my bad", "i was wrong", "i went wrong",
                              "you’re correct", "you are correct", "i stand corrected"]
-    out_str = str()
+
     for key_phrase in agreement_key_phrases:
-        substring_index = in_str.find(key_phrase)
+        substring_index = in_str.lower().find(key_phrase)
+        # print()
         if substring_index != -1:
             print(in_str[:substring_index] +
                   f"{Fore.GREEN}" +
