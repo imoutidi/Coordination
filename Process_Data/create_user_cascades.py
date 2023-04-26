@@ -1,4 +1,6 @@
 import os
+
+import colorama
 from dateutil.relativedelta import relativedelta
 from Tool_Pack import tools
 from operator import itemgetter
@@ -8,6 +10,11 @@ import json
 import csv
 import time
 import datetime
+
+# Display colored text in console
+from colorama import init as colorama_init
+from colorama import Fore
+from colorama import Style
 
 
 def merge_submissions_and_comments():
@@ -185,8 +192,17 @@ def check_for_agreement_keywords():
             if agree_user_cascade[0]["author"] not in cascades_username_tracker:
                 cascades_username_tracker.add(agree_user_cascade[0]["author"])
                 user_cascades.append(agree_user_cascade)
+    all_users_agree_indexes = list()
+    for user_casc in user_cascades:
+        indexes_list = list()
+        for idx, casc_dict in enumerate(user_casc):
+            if "post_comments" in casc_dict:
+                indexes_list.append(idx)
+        all_users_agree_indexes.append(indexes_list)
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                       r"Storm_on_capitol\Users\agree_user_cascades", user_cascades)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                      r"Storm_on_capitol\Users\all_users_agree_indexes", all_users_agree_indexes)
 
 
 
@@ -210,6 +226,56 @@ def check_stuff():
     print(f"total_count = {total_count}\n t1 = {t1_count} \n t2 = {t2_count} \n t3 = {t3_count}")
 
 
+def annotate():
+    comment_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+                                      r"Datasets\Storm_on_capitol\Annotations\comment_index")
+    # comment_index = 0
+    index_counter = 0
+    agree_user_cascades = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                            r"Storm_on_capitol\Users\agree_user_cascades")
+    all_users_agree_indexes = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                                r"Storm_on_capitol\Users\all_users_agree_indexes")
+    ta_kala_kopikane_sto_modaz = list()
+    for user_cascade, index_list in zip(agree_user_cascades, all_users_agree_indexes):
+        for c_index in index_list:
+            ta_kala_kopikane_sto_modaz.append(user_cascade[c_index])
+    comments_to_keep = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+                                         r"Datasets\Storm_on_capitol\Annotations\kept_comments")
+    # comments_to_keep = list()
+    for idx, comment in enumerate(ta_kala_kopikane_sto_modaz[comment_index:]):
+        print_with_phrase_colored(comment["body"])
+        # print(comment["body"])
+        print(idx+comment_index)
+        index_counter += 1
+        answer = input("Keep this comment?")
+        if answer == "Y":
+            comments_to_keep.append(comment)
+        if answer == "STOP":
+            break
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+                      r"Datasets\Storm_on_capitol\Annotations\kept_comments", comments_to_keep)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+                      r"Datasets\Storm_on_capitol\Annotations\comment_index", comment_index + index_counter - 1)
+
+
+def print_with_phrase_colored(in_str):
+    colorama.init()
+    agreement_key_phrases = ["i agree", "you were right", "you are right", "thats true", "that is true", "good point",
+                             "fair enough", "fair point", "you have a point", "you got a point", "excellent point",
+                             "excellent argument", "good argument", "exactly this", " +1 ", "ok got it", "got it",
+                             "i get it", "amen to that", "i see your point", "my bad", "i was wrong", "i went wrong",
+                             "you’re correct", "you are correct", "i stand corrected"]
+    out_str = str()
+    for key_phrase in agreement_key_phrases:
+        substring_index = in_str.find(key_phrase)
+        if substring_index != -1:
+            print(in_str[:substring_index] +
+                  f"{Fore.GREEN}" +
+                  in_str[substring_index:substring_index + len(key_phrase)] +
+                  f"{Style.RESET_ALL}" +
+                  in_str[substring_index + len(key_phrase):])
+
+
 if __name__ == "__main__":
     # merge_submissions_and_comments()
     # scan_users()
@@ -217,8 +283,7 @@ if __name__ == "__main__":
     # create_comments_index()
     # check_stuff()
     # create_submission_index()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
-    #                       r"Datasets\Storm_on_capitol\Indexes\submissions_index")
-    check_for_agreement_keywords()
+    # check_for_agreement_keywords()
+    annotate()
 
     print()
