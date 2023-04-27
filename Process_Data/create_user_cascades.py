@@ -205,7 +205,6 @@ def check_for_agreement_keywords():
                       r"Storm_on_capitol\Users\all_users_agree_indexes", all_users_agree_indexes)
 
 
-
 def check_stuff():
     comments_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                                        r"Storm_on_capitol\Indexes\comments_index")
@@ -270,6 +269,7 @@ def print_with_phrase_colored(in_str):
         substring_index = in_str.lower().find(key_phrase)
         # print()
         if substring_index != -1:
+            # The weird print is how colorama works.
             print(in_str[:substring_index] +
                   f"{Fore.GREEN}" +
                   in_str[substring_index:substring_index + len(key_phrase)] +
