@@ -306,8 +306,14 @@ def opinion_changed():
         for c_index in index_list:
             comments_with_agree_key_phrase.append(user_cascade[c_index])
 
-    for idx, comment in enumerate(comments_with_agree_key_phrase):
-        print()
+    # Gather the permalinks in a file, add the prefix https://www.reddit.com/ as well.
+    permalink_list = list()
+    for idx in list_of_changed_ids:
+        permalink_list.append("https://www.reddit.com" + comments_with_agree_key_phrase[idx]["permalink"])
+    with open(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\\"
+              r"Annotations\opinion_change_permalinks.txt", "w") as perma_file:
+        for url in permalink_list:
+            perma_file.write(url + "\n")
 
 
 if __name__ == "__main__":
