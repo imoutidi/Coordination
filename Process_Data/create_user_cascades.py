@@ -228,7 +228,7 @@ def check_stuff():
 def annotate():
     comment_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
                                       r"Datasets\Storm_on_capitol\Annotations\comment_index")
-    # comment_index = 35
+    comment_index = 0
     index_counter = 0
     agree_user_cascades = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                                             r"Storm_on_capitol\Users\agree_user_cascades")
@@ -238,9 +238,9 @@ def annotate():
     for user_cascade, index_list in zip(agree_user_cascades, all_users_agree_indexes):
         for c_index in index_list:
             ta_kala_kopikane_sto_modaz.append(user_cascade[c_index])
-    comments_to_keep = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
-                                         r"Datasets\Storm_on_capitol\Annotations\kept_comments")
-    # comments_to_keep = list()
+    # comments_to_keep = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+    #                                      r"Datasets\Storm_on_capitol\Annotations\kept_comments")
+    comments_to_keep = list()
     for idx, comment in enumerate(ta_kala_kopikane_sto_modaz[comment_index:]):
         print_with_phrase_colored(comment["body"])
         # print(comment["body"])
@@ -251,10 +251,10 @@ def annotate():
             comments_to_keep.append(comment)
         if answer == "STOP":
             break
-    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
-                      r"Datasets\Storm_on_capitol\Annotations\kept_comments", comments_to_keep)
-    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
-                      r"Datasets\Storm_on_capitol\Annotations\comment_index", comment_index + index_counter - 1)
+    # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+    #                   r"Datasets\Storm_on_capitol\Annotations\kept_comments", comments_to_keep)
+    # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+    #                   r"Datasets\Storm_on_capitol\Annotations\comment_index", comment_index + index_counter - 1)
 
 
 def print_with_phrase_colored(in_str):
@@ -277,6 +277,27 @@ def print_with_phrase_colored(in_str):
                   in_str[substring_index + len(key_phrase):])
 
 
+def opinion_changed():
+    list_of_changed_ids = [6, 37, 62, 70, 85, 89, 93, 97, 100, 182, 183, 200, 201, 208, 222, 225, 241, 262, 263, 297,
+                           339, 359, 360, 385, 386, 389, 430, 453, 422, 458, 470, 474, 477, 484, 486, 497, 501, 508,
+                           514, 518, 524, 544, 554, 555, 570, 572, 600, 620, 626, 630, 631, 632, 633, 642, 653, 661,
+                           676, 679, 700, 703, 715, 717, 721, 724, 735, 736, 739, 752, 758, 759, 762, 782, 784, 792,
+                           795, 828, 836, 839, 841, 850, 853, 874, 891, 892, 915, 916, 918, 943, 944, 957, 973, 1020,
+                           1022, 1023, 1055, 1056, 1064, 1065, 1073, 1104, 1142, 1174, 1175, 1176, 1184, 1224, 1244,
+                           1246, 1260, 1272, 1312, 1335, 1373, 1376, 1410, 1411, 1427, 1434, 1435, 1436, 1453, 1463,
+                           1473, 1525, 1559, 1569, 1602, 1615, 1643, 1654, 1655, 1677, 1681, 1683, 1685, 1725, 1765,
+                           1766, 1791, 1792, 1796, 1798, 1835, 1873, 1877, 1886, 1895, 1897, 1902, 1905, 1910, 1927,
+                           1933, 1945, 1946, 1958, 1980, 1997, 2013, 2018, 2021, 2022, 2030, 2039, 2121, 2122, 2128,
+                           2132, 2144, 2195, 2231, 2241, 2286, 2301, 2319, 2379, 2383, 2406, 2409, 2412, 2413, 2415,
+                           2426, 2459, 2462, 2463, 2464, 2465, 2467, 2470, 2471, 2475, 2483, 2485, 2488, 2489, 2490,
+                           2493, 2494, 2497, 2498, 2499, 2500, 2501, 2502, 2507, 2508, 2509, 2510, 2511, 2513, 2515,
+                           2519, 2520, 2521, 2522, 2524, 2525, 2528, 2530, 2531, 2532, 2536, 2537, 2538, 2539, 2545,
+                           2552, 2557, 2576, 2580, 2583, 2587, 2589, 2590, 2595, 2598, 2603, 2605, 2606, 2607, 2608,
+                           2609, 2611, 2622, 2624, 2637, 2647, 2654, 2657, 2666, 2672, 2679, 2761, 2768, 2769, 2774,
+                           2796, 2797, 2806, 2809, 2810, 2811, 2817, 2829]
+    print()
+
+
 if __name__ == "__main__":
     # merge_submissions_and_comments()
     # scan_users()
@@ -285,6 +306,8 @@ if __name__ == "__main__":
     # check_stuff()
     # create_submission_index()
     # check_for_agreement_keywords()
-    annotate()
-
+    # annotate()
+    opinion_changed()
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                          # r"Storm_on_capitol\Annotations\kept_comments")
     print()
