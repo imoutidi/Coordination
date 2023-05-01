@@ -192,6 +192,7 @@ def check_for_agreement_keywords():
             if agree_user_cascade[0]["author"] not in cascades_username_tracker:
                 cascades_username_tracker.add(agree_user_cascade[0]["author"])
                 user_cascades.append(agree_user_cascade)
+    # indexing the comments in the users cascade where their text includes one or more "agree" key_phrases
     all_users_agree_indexes = list()
     for user_casc in user_cascades:
         indexes_list = list()
@@ -234,14 +235,14 @@ def annotate():
                                             r"Storm_on_capitol\Users\agree_user_cascades")
     all_users_agree_indexes = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                                                 r"Storm_on_capitol\Users\all_users_agree_indexes")
-    ta_kala_kopikane_sto_modaz = list()
+    comments_with_agree_key_phrase = list()
     for user_cascade, index_list in zip(agree_user_cascades, all_users_agree_indexes):
         for c_index in index_list:
-            ta_kala_kopikane_sto_modaz.append(user_cascade[c_index])
+            comments_with_agree_key_phrase.append(user_cascade[c_index])
     # comments_to_keep = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
     #                                      r"Datasets\Storm_on_capitol\Annotations\kept_comments")
     comments_to_keep = list()
-    for idx, comment in enumerate(ta_kala_kopikane_sto_modaz[comment_index:]):
+    for idx, comment in enumerate(comments_with_agree_key_phrase[comment_index:]):
         print_with_phrase_colored(comment["body"])
         # print(comment["body"])
         print(idx+comment_index)
@@ -295,7 +296,18 @@ def opinion_changed():
                            2552, 2557, 2576, 2580, 2583, 2587, 2589, 2590, 2595, 2598, 2603, 2605, 2606, 2607, 2608,
                            2609, 2611, 2622, 2624, 2637, 2647, 2654, 2657, 2666, 2672, 2679, 2761, 2768, 2769, 2774,
                            2796, 2797, 2806, 2809, 2810, 2811, 2817, 2829]
-    print()
+
+    agree_user_cascades = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                            r"Storm_on_capitol\Users\agree_user_cascades")
+    all_users_agree_indexes = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                                r"Storm_on_capitol\Users\all_users_agree_indexes")
+    comments_with_agree_key_phrase = list()
+    for user_cascade, index_list in zip(agree_user_cascades, all_users_agree_indexes):
+        for c_index in index_list:
+            comments_with_agree_key_phrase.append(user_cascade[c_index])
+
+    for idx, comment in enumerate(comments_with_agree_key_phrase):
+        print()
 
 
 if __name__ == "__main__":
