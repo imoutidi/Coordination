@@ -50,7 +50,23 @@ def create_comments_index():
         for current_record in all_records:
             sid = current_record[0]["id"]
             for post_comment in current_record[1]:
-                if post_comment["author_fullname"] in list_of_irrelevant_usernames:
+                if post_comment["author_fullname"] == "N_A":
+                    c_author = "N_A"
+                    c_author_fullname = "N_A"
+                    c_sid = post_comment["id"]
+                    c_body = post_comment["body"]
+                    c_subreddit = post_comment["subreddit"]
+                    if post_comment["created_utc"] == "N_A":
+                        c_timestamp = -1
+                    else:
+                        c_timestamp = int(post_comment["created_utc"])
+                    c_score = post_comment["score"]
+                    c_perma = post_comment["permalink"]
+                    c_parent_id = post_comment["parent_id"]
+                    c_snapshot_dict = {"author": c_author, "author_fullname": c_author_fullname, "post_id": sid,
+                                       "body": c_body, "subreddit": c_subreddit, "timestamp": c_timestamp,
+                                       "score": c_score, "parent_id": c_parent_id, "permalink": c_perma}
+                    comments_dict[c_sid] = c_snapshot_dict
                     continue
                 c_author = post_comment["author"].name
                 c_author_fullname = post_comment["author_fullname"]
@@ -66,7 +82,7 @@ def create_comments_index():
                                    "score": c_score, "parent_id": c_parent_id, "permalink": c_perma}
                 comments_dict[c_sid] = c_snapshot_dict
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                      r"Storm_on_capitol\Indexes\comments_index"
+                      r"Storm_on_capitol\Indexes\comments_index_with_irrelevant"
                       , comments_dict)
 
 
@@ -228,7 +244,7 @@ def check_stuff():
 
 def annotate():
     comment_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
-                                      r"Datasets\Storm_on_capitol\Annotations\comment_index")
+                                      r"Datasets\Storm_on_capitol\Annotations\comment_number")
     comment_index = 0
     index_counter = 0
     agree_user_cascades = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
@@ -255,7 +271,7 @@ def annotate():
     # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
     #                   r"Datasets\Storm_on_capitol\Annotations\kept_comments", comments_to_keep)
     # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
-    #                   r"Datasets\Storm_on_capitol\Annotations\comment_index", comment_index + index_counter - 1)
+    #                   r"Datasets\Storm_on_capitol\Annotations\comment_number", comment_index + index_counter - 1)
 
 
 def print_with_phrase_colored(in_str):
@@ -316,6 +332,80 @@ def opinion_changed():
             perma_file.write(url + "\n")
 
 
+def group_opinion_changed_with_parent_child_comments():
+    list_of_changed_ids = [6, 37, 62, 70, 85, 89, 93, 97, 100, 182, 183, 200, 201, 208, 222, 225, 241, 262, 263, 297,
+                           339, 359, 360, 385, 386, 389, 430, 453, 422, 458, 470, 474, 477, 484, 486, 497, 501, 508,
+                           514, 518, 524, 544, 554, 555, 570, 572, 600, 620, 626, 630, 631, 632, 633, 642, 653, 661,
+                           676, 679, 700, 703, 715, 717, 721, 724, 735, 736, 739, 752, 758, 759, 762, 782, 784, 792,
+                           795, 828, 836, 839, 841, 850, 853, 874, 891, 892, 915, 916, 918, 943, 944, 957, 973, 1020,
+                           1022, 1023, 1055, 1056, 1064, 1065, 1073, 1104, 1142, 1174, 1175, 1176, 1184, 1224, 1244,
+                           1246, 1260, 1272, 1312, 1335, 1373, 1376, 1410, 1411, 1427, 1434, 1435, 1436, 1453, 1463,
+                           1473, 1525, 1559, 1569, 1602, 1615, 1643, 1654, 1655, 1677, 1681, 1683, 1685, 1725, 1765,
+                           1766, 1791, 1792, 1796, 1798, 1835, 1873, 1877, 1886, 1895, 1897, 1902, 1905, 1910, 1927,
+                           1933, 1945, 1946, 1958, 1980, 1997, 2013, 2018, 2021, 2022, 2030, 2039, 2121, 2122, 2128,
+                           2132, 2144, 2195, 2231, 2241, 2286, 2301, 2319, 2379, 2383, 2406, 2409, 2412, 2413, 2415,
+                           2426, 2459, 2462, 2463, 2464, 2465, 2467, 2470, 2471, 2475, 2483, 2485, 2488, 2489, 2490,
+                           2493, 2494, 2497, 2498, 2499, 2500, 2501, 2502, 2507, 2508, 2509, 2510, 2511, 2513, 2515,
+                           2519, 2520, 2521, 2522, 2524, 2525, 2528, 2530, 2531, 2532, 2536, 2537, 2538, 2539, 2545,
+                           2552, 2557, 2576, 2580, 2583, 2587, 2589, 2590, 2595, 2598, 2603, 2605, 2606, 2607, 2608,
+                           2609, 2611, 2622, 2624, 2637, 2647, 2654, 2657, 2666, 2672, 2679, 2761, 2768, 2769, 2774,
+                           2796, 2797, 2806, 2809, 2810, 2811, 2817, 2829]
+    comments_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                       r"Storm_on_capitol\Indexes\comments_index_with_irrelevant")
+    submissions_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                          r"Storm_on_capitol\Indexes\submissions_index")
+    agree_user_cascades = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                            r"Storm_on_capitol\Users\agree_user_cascades")
+    all_users_agree_indexes = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                                r"Storm_on_capitol\Users\all_users_agree_indexes")
+    comments_with_agree_key_phrase = list()
+    for user_cascade, index_list in zip(agree_user_cascades, all_users_agree_indexes):
+        for c_index in index_list:
+            comments_with_agree_key_phrase.append(user_cascade[c_index])
+
+    all_populated_comments_with_parents = list()
+    ids_not_found = 0
+    for idx in list_of_changed_ids:
+        list_of_submission_parent_and_original_comments = list()
+        comment_meta = comments_with_agree_key_phrase[idx]
+        submission_meta = submissions_index[comment_meta["post_id"]]
+        # Appending the agreement comment
+        list_of_submission_parent_and_original_comments.append(comment_meta)
+        parent_post_kind = comment_meta["parent_id"][0:2]
+        parent_post_id = comment_meta["parent_id"][3:]
+        # Appending the parent comments
+        while parent_post_kind == "t1":
+            if parent_post_id in comments_index:
+                comment_meta = comments_index[parent_post_id]
+                comment_meta["comment_id"] = parent_post_id
+                list_of_submission_parent_and_original_comments.append(comment_meta)
+                parent_post_kind = comment_meta["parent_id"][0:2]
+                parent_post_id = comment_meta["parent_id"][3:]
+            else:
+                parent_post_kind = "exit"
+                ids_not_found += 1
+        # Appending the submission post
+        list_of_submission_parent_and_original_comments.append(submission_meta[0])
+        all_populated_comments_with_parents.append(list_of_submission_parent_and_original_comments)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\\"
+                      r"Annotations\populated_agree_comments_with_parents_and_subission_post",
+                      all_populated_comments_with_parents)
+    print(ids_not_found)
+    with open(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\Annotations\\"
+              r"populated_agree_comments_with_parents.txt", "w", encoding='utf-8') as parents_file:
+        for idx, parent_list in enumerate(all_populated_comments_with_parents):
+            parents_file.write("Comment: " + str(idx) + "\n")
+            submission_data = parent_list.pop()
+            parents_file.write("Author: " + submission_data["author"] + " Post ID: " + submission_data["id"] +
+                               "\nTitle: " + submission_data["title"] +
+                               " Selftext: " + submission_data["selftext"] + "\n\n")
+            for meta_data in reversed(parent_list):
+                print()
+                parents_file.write("Author: " + meta_data["author"] + " Comment_ID: " + meta_data["comment_id"] +
+                                   "\n" + "Body: " + meta_data["body"] + "\n\n")
+            parents_file.write("\n")
+
+
 if __name__ == "__main__":
     # merge_submissions_and_comments()
     # scan_users()
@@ -325,7 +415,8 @@ if __name__ == "__main__":
     # create_submission_index()
     # check_for_agreement_keywords()
     # annotate()
-    opinion_changed()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                          # r"Storm_on_capitol\Annotations\kept_comments")
+    # opinion_changed()
+    # group_opinion_changed_with_parent_child_comments()
+    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\\"
+                          r"Annotations\populated_agree_comments_with_parents_and_subission_post")
     print()
