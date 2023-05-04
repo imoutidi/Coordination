@@ -181,20 +181,30 @@ def check_for_agreement_keywords():
                                                   r"Datasets\Storm_on_capitol\Users\frequent_users_and_their_posts")
     submission_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                                          r"Storm_on_capitol\Indexes\submissions_index")
-    agreement_key_phrases = ["i agree", "you were right", "you are right", "thats true", "that is true", "good point",
-                             "fair enough", "fair point", "you have a point", "you got a point", "excellent point",
-                             "excellent argument", "good argument", "exactly this", " +1 ", "ok got it", "got it",
-                             "i get it", "amen to that", "i see your point", "my bad", "i was wrong", "i went wrong",
-                             "you’re correct", "you are correct", "i stand corrected"]
+    # agreement_key_phrases = ["i agree", "you were right", "you are right", "you're right", "thats true", "that is true",
+    #                          "good point", "fair enough", "fair point", "you have a point", "you got a point",
+    #                          "excellent point", "excellent argument", "good argument", "exactly this", " +1 ",
+    #                          "ok got it", "got it", "i get it", "amen to that", "i see your point", "my bad",
+    #                          "i am wrong", "i'm wrong", "i was wrong", "i went wrong", "you’re correct",
+    #                          "you are correct", "i stand corrected"]
+    against_trump_key_phrases = ["i used to support trump but ", "i used to like trump ", " i voted for trump ",
+                                 "not voting for trump again ", " never again voting for trump ", " trump never again ",
+                                 " changed my mind about trump ", " i don't like trump anymore ",
+                                 " i was wrong voting for trump ", " changed my mind about trump ",
+                                 " don't support trump anymore ", " i am disappointed on trump ",
+                                 " i was wrong about trump ", " voted for trump ", " support trump ", " like trump ",
+                                 " trump but ", " trump again ", " changed my view on trump ", " wrong on trump "]
     for f_user_tuple in frequent_users_with_posts:
         for u_post in f_user_tuple[1]:
             # body means it is a comment.
             if "body" in u_post:
                 post_text = u_post["body"].lower().replace("\n", "").strip()
-                for agree_phrase in agreement_key_phrases:
+                for agree_phrase in against_trump_key_phrases:
                     if agree_phrase in post_text:
                         # temp_agreeable_posts.append((f_user_tuple[0][0], u_post))
                         key_phrase_to_opinion_comment[agree_phrase].append((f_user_tuple[0][0], u_post))
+                        print(post_text)
+                        print()
     for key_phrase, list_of_comments in key_phrase_to_opinion_comment.items():
         for agree_comment in list_of_comments:
             agree_user_cascade = posts_per_user[agree_comment[0]]
@@ -217,9 +227,9 @@ def check_for_agreement_keywords():
                 indexes_list.append(idx)
         all_users_agree_indexes.append(indexes_list)
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                      r"Storm_on_capitol\Users\agree_user_cascades", user_cascades)
+                      r"Storm_on_capitol\Users\anti_trump_user_cascades", user_cascades)
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                      r"Storm_on_capitol\Users\all_users_agree_indexes", all_users_agree_indexes)
+                      r"Storm_on_capitol\Users\all_anti_trump_users_indexes", all_users_agree_indexes)
 
 
 def check_stuff():
@@ -276,11 +286,12 @@ def annotate():
 
 def print_with_phrase_colored(in_str):
     colorama.init()
-    agreement_key_phrases = ["i agree", "you were right", "you are right", "thats true", "that is true", "good point",
-                             "fair enough", "fair point", "you have a point", "you got a point", "excellent point",
-                             "excellent argument", "good argument", "exactly this", " +1 ", "ok got it", "got it",
-                             "i get it", "amen to that", "i see your point", "my bad", "i was wrong", "i went wrong",
-                             "you’re correct", "you are correct", "i stand corrected"]
+    agreement_key_phrases = ["i agree", "you were right", "you are right", "you're right", "thats true", "that is true",
+                             "good point", "fair enough", "fair point", "you have a point", "you got a point",
+                             "excellent point", "excellent argument", "good argument", "exactly this", " +1 ",
+                             "ok got it", "got it", "i get it", "amen to that", "i see your point", "my bad",
+                             "i am wrong", "i'm wrong", "i was wrong", "i went wrong", "you’re correct",
+                             "you are correct", "i stand corrected"]
 
     for key_phrase in agreement_key_phrases:
         substring_index = in_str.lower().find(key_phrase)
@@ -327,9 +338,10 @@ def opinion_changed():
     for idx in list_of_changed_ids:
         permalink_list.append("https://www.reddit.com" + comments_with_agree_key_phrase[idx]["permalink"])
     with open(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\\"
-              r"Annotations\opinion_change_permalinks.txt", "w") as perma_file:
-        for url in permalink_list:
-            perma_file.write(url + "\n")
+              r"Annotations\opinion_change_permalinks.html", "w") as perma_file:
+        for idx, url in enumerate(permalink_list):
+            # perma_file.write(url + "\n")
+            perma_file.write(str(idx) + " <a href=" + url + ">" + url + "</a><br>")
 
 
 def group_opinion_changed_with_parent_child_comments():
@@ -406,6 +418,22 @@ def group_opinion_changed_with_parent_child_comments():
             parents_file.write("\n")
 
 
+def regroup():
+    first_pick = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\\"
+                                   r"Annotations\populated_agree_comments_with_parents_and_subission_post")
+    second_pick_indexes = [1, 3, 5, 6, 8, 9, 10, 12, 13, 14, 19, 21, 22, 23, 24, 25, 26, 27, 29, 30, 31, 32, 33, 35,
+                           36, 37, 38, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50, 54, 55, 60, 61, 62, 64, 66, 68, 69, 70,
+                           71, 72, 73, 74, 75, 76, 77, 82, 83, 85, 86, 87, 88, 89, 90, 91, 93, 94, 95, 96, 97, 99, 101,
+                           102, 103, 104, 107, 108, 109, 110, 112, 114, 115, 116, 117, 119, 121, 123, 124, 127, 128,
+                           133, 134, 135, 141, 142, 143, 144, 145, 147, 148, 149, 150, 152, 153, 154, 156, 157, 158,
+                           159, 160, 161, 162, 164, 165, 166, 168, 172, 173, 174, 176, 177, 178, 179, 180, 182, 183,
+                           184, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 200, 202, 205, 206, 208,
+                           209, 210, 211, 212, 213, 214, 215, 217, 219, 220, 221, 222, 223, 224, 227, 230, 231, 232,
+                           233, 234, 236, 238, 239, 240, 241, 242, 243, 244, 245, 246, 248, 249, 251, 252, 253, 254,
+                           255, 256, 258, 259, 260, 261, 263, 264]
+    print()
+
+
 if __name__ == "__main__":
     # merge_submissions_and_comments()
     # scan_users()
@@ -417,6 +445,5 @@ if __name__ == "__main__":
     # annotate()
     # opinion_changed()
     # group_opinion_changed_with_parent_child_comments()
-    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\\"
-                          r"Annotations\populated_agree_comments_with_parents_and_subission_post")
+    regroup()
     print()
