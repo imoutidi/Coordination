@@ -192,8 +192,7 @@ def check_for_agreement_keywords():
                                  " changed my mind about trump ", " i don't like trump anymore ",
                                  " i was wrong voting for trump ", " changed my mind about trump ",
                                  " don't support trump anymore ", " i am disappointed on trump ",
-                                 " i was wrong about trump ", " voted for trump ", " support trump ", " like trump ",
-                                 " trump but ", " trump again ", " changed my view on trump ", " wrong on trump "]
+                                 " i was wrong about trump ", " changed my view on trump ", " wrong on trump "]
     for f_user_tuple in frequent_users_with_posts:
         for u_post in f_user_tuple[1]:
             # body means it is a comment.
@@ -258,15 +257,15 @@ def annotate():
     comment_index = 0
     index_counter = 0
     agree_user_cascades = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                                            r"Storm_on_capitol\Users\agree_user_cascades")
+                                            r"Storm_on_capitol\Users\anti_trump_user_cascades")
     all_users_agree_indexes = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                                                r"Storm_on_capitol\Users\all_users_agree_indexes")
+                                                r"Storm_on_capitol\Users\all_anti_trump_users_indexes")
     comments_with_agree_key_phrase = list()
     for user_cascade, index_list in zip(agree_user_cascades, all_users_agree_indexes):
         for c_index in index_list:
             comments_with_agree_key_phrase.append(user_cascade[c_index])
-    # comments_to_keep = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
-    #                                      r"Datasets\Storm_on_capitol\Annotations\kept_comments")
+    comments_to_keep = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+                                         r"Datasets\Storm_on_capitol\Annotations\kept_comments")
     comments_to_keep = list()
     for idx, comment in enumerate(comments_with_agree_key_phrase[comment_index:]):
         print_with_phrase_colored(comment["body"])
@@ -278,10 +277,10 @@ def annotate():
             comments_to_keep.append(comment)
         if answer == "STOP":
             break
-    # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
-    #                   r"Datasets\Storm_on_capitol\Annotations\kept_comments", comments_to_keep)
-    # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
-    #                   r"Datasets\Storm_on_capitol\Annotations\comment_number", comment_index + index_counter - 1)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+                      r"Datasets\Storm_on_capitol\Annotations\kept_comments", comments_to_keep)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\\"
+                      r"Datasets\Storm_on_capitol\Annotations\comment_number", comment_index + index_counter - 1)
 
 
 def print_with_phrase_colored(in_str):
@@ -457,11 +456,47 @@ def populate_opinion_change_comments_with_child_comments():
 
         for comment in submission_comments:
             if target_comment_id in comment["parent_id"]:
-                opinion_ch.append(comment)
+                if comment["author_fullname"] == "N_A":
+                    c_author = "N_A"
+                    c_author_fullname = "N_A"
+                    c_sid = comment["id"]
+                    c_body = comment["body"]
+                    c_subreddit = comment["subreddit"]
+                    if comment["created_utc"] == "N_A":
+                        c_timestamp = -1
+                    else:
+                        c_timestamp = int(comment["created_utc"])
+                    c_score = comment["score"]
+                    c_perma = comment["permalink"]
+                    c_parent_id = comment["parent_id"]
+                    c_snapshot_dict = {"author": c_author, "author_fullname": c_author_fullname,
+                                       "post_id": submission_id, "body": c_body, "subreddit": c_subreddit,
+                                       "timestamp": c_timestamp, "score": c_score, "parent_id": c_parent_id,
+                                       "permalink": c_perma, "comment_id": c_sid, "is_child": True}
+                    opinion_ch.append(c_snapshot_dict)
+                    continue
+                c_author = comment["author"].name
+                c_author_fullname = comment["author_fullname"]
+                c_sid = comment["id"]
+                c_body = comment["body"]
+                c_subreddit = comment["subreddit"]
+                c_timestamp = int(comment["created_utc"])
+                c_score = comment["score"]
+                c_perma = comment["permalink"]
+                c_parent_id = comment["parent_id"]
+                c_snapshot_dict = {"author": c_author, "author_fullname": c_author_fullname, "post_id": submission_id,
+                                   "body": c_body, "subreddit": c_subreddit, "timestamp": c_timestamp,
+                                   "score": c_score, "parent_id": c_parent_id, "permalink": c_perma,
+                                   "comment_id": c_sid, "is_child": True}
+                opinion_ch.append(c_snapshot_dict)
 
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\Annotations\\"
                       r"populated_opinion_change_comments_with_parents_children_and_submission_post",
                       submission_and_parents)
+
+
+def anti_trump():
+    print()
 
 
 if __name__ == "__main__":
@@ -475,6 +510,7 @@ if __name__ == "__main__":
     # annotate()
     # opinion_changed()
     # group_opinion_changed_with_parent_child_comments()
-    populate_opinion_change_comments_with_child_comments()
+    # populate_opinion_change_comments_with_child_comments()
 
+    #
     print()
