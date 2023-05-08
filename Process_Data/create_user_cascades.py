@@ -16,7 +16,7 @@ from colorama import init as colorama_init
 from colorama import Fore
 from colorama import Style
 
-
+# I KNOW ABOUT THE NUMBERS
 def merge_submissions_and_comments():
     comments_path = r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\Comments\\"
     all_submissions = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
@@ -324,6 +324,17 @@ def opinion_changed():
                            2609, 2611, 2622, 2624, 2637, 2647, 2654, 2657, 2666, 2672, 2679, 2761, 2768, 2769, 2774,
                            2796, 2797, 2806, 2809, 2810, 2811, 2817, 2829]
 
+    second_pick_indexes = [1, 3, 5, 6, 8, 9, 10, 12, 13, 14, 19, 21, 22, 23, 24, 25, 26, 27, 29, 30, 31, 32, 33, 35,
+                           36, 37, 38, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50, 54, 55, 60, 61, 62, 64, 66, 68, 69, 70,
+                           71, 72, 73, 74, 75, 76, 77, 82, 83, 85, 86, 87, 88, 89, 90, 91, 93, 94, 95, 96, 97, 99, 101,
+                           102, 103, 104, 107, 108, 109, 110, 112, 114, 115, 116, 117, 119, 121, 123, 124, 127, 128,
+                           133, 134, 135, 141, 142, 143, 144, 145, 147, 148, 149, 150, 152, 153, 154, 156, 157, 158,
+                           159, 160, 161, 162, 164, 165, 166, 168, 172, 173, 174, 176, 177, 178, 179, 180, 182, 183,
+                           184, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 200, 202, 205, 206, 208,
+                           209, 210, 211, 212, 213, 214, 215, 217, 219, 220, 221, 222, 223, 224, 227, 230, 231, 232,
+                           233, 234, 236, 238, 239, 240, 241, 242, 243, 244, 245, 246, 248, 249, 251, 252, 253, 254,
+                           255, 256, 258, 259, 260, 261, 263, 264]
+
     agree_user_cascades = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                                             r"Storm_on_capitol\Users\agree_user_cascades")
     all_users_agree_indexes = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
@@ -335,8 +346,8 @@ def opinion_changed():
 
     # Gather the permalinks in a file, add the prefix https://www.reddit.com/ as well.
     permalink_list = list()
-    for idx in list_of_changed_ids:
-        permalink_list.append("https://www.reddit.com" + comments_with_agree_key_phrase[idx]["permalink"])
+    for idx in second_pick_indexes:
+        permalink_list.append("https://www.reddit.com" + comments_with_agree_key_phrase[list_of_changed_ids[idx]]["permalink"])
     with open(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\\"
               r"Annotations\opinion_change_permalinks.html", "w") as perma_file:
         for idx, url in enumerate(permalink_list):
@@ -362,6 +373,17 @@ def group_opinion_changed_with_parent_child_comments():
                            2552, 2557, 2576, 2580, 2583, 2587, 2589, 2590, 2595, 2598, 2603, 2605, 2606, 2607, 2608,
                            2609, 2611, 2622, 2624, 2637, 2647, 2654, 2657, 2666, 2672, 2679, 2761, 2768, 2769, 2774,
                            2796, 2797, 2806, 2809, 2810, 2811, 2817, 2829]
+
+    second_pick_indexes = [1, 3, 5, 6, 8, 9, 10, 12, 13, 14, 19, 21, 22, 23, 24, 25, 26, 27, 29, 30, 31, 32, 33, 35,
+                           36, 37, 38, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50, 54, 55, 60, 61, 62, 64, 66, 68, 69, 70,
+                           71, 72, 73, 74, 75, 76, 77, 82, 83, 85, 86, 87, 88, 89, 90, 91, 93, 94, 95, 96, 97, 99, 101,
+                           102, 103, 104, 107, 108, 109, 110, 112, 114, 115, 116, 117, 119, 121, 123, 124, 127, 128,
+                           133, 134, 135, 141, 142, 143, 144, 145, 147, 148, 149, 150, 152, 153, 154, 156, 157, 158,
+                           159, 160, 161, 162, 164, 165, 166, 168, 172, 173, 174, 176, 177, 178, 179, 180, 182, 183,
+                           184, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 200, 202, 205, 206, 208,
+                           209, 210, 211, 212, 213, 214, 215, 217, 219, 220, 221, 222, 223, 224, 227, 230, 231, 232,
+                           233, 234, 236, 238, 239, 240, 241, 242, 243, 244, 245, 246, 248, 249, 251, 252, 253, 254,
+                           255, 256, 258, 259, 260, 261, 263, 264]
     comments_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                                        r"Storm_on_capitol\Indexes\comments_index_with_irrelevant")
     submissions_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
@@ -377,9 +399,10 @@ def group_opinion_changed_with_parent_child_comments():
 
     all_populated_comments_with_parents = list()
     ids_not_found = 0
-    for idx in list_of_changed_ids:
+    # for idx in list_of_changed_ids:
+    for idx in second_pick_indexes:
         list_of_submission_parent_and_original_comments = list()
-        comment_meta = comments_with_agree_key_phrase[idx]
+        comment_meta = comments_with_agree_key_phrase[list_of_changed_ids[idx]]
         submission_meta = submissions_index[comment_meta["post_id"]]
         # Appending the agreement comment
         list_of_submission_parent_and_original_comments.append(comment_meta)
@@ -400,38 +423,45 @@ def group_opinion_changed_with_parent_child_comments():
         list_of_submission_parent_and_original_comments.append(submission_meta[0])
         all_populated_comments_with_parents.append(list_of_submission_parent_and_original_comments)
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\\"
-                      r"Annotations\populated_agree_comments_with_parents_and_subission_post",
+                      r"Annotations\populated_opinion_change_comments_with_parents_and_submission_post",
                       all_populated_comments_with_parents)
     print(ids_not_found)
-    with open(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\Annotations\\"
-              r"populated_agree_comments_with_parents.txt", "w", encoding='utf-8') as parents_file:
-        for idx, parent_list in enumerate(all_populated_comments_with_parents):
-            parents_file.write("Comment: " + str(idx) + "\n")
-            submission_data = parent_list.pop()
-            parents_file.write("Author: " + submission_data["author"] + " Post ID: " + submission_data["id"] +
-                               "\nTitle: " + submission_data["title"] +
-                               " Selftext: " + submission_data["selftext"] + "\n\n")
-            for meta_data in reversed(parent_list):
-                print()
-                parents_file.write("Author: " + meta_data["author"] + " Comment_ID: " + meta_data["comment_id"] +
-                                   "\n" + "Body: " + meta_data["body"] + "\n\n")
-            parents_file.write("\n")
+    # with open(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\Annotations\\"
+    #           r"populated_agree_comments_with_parents.txt", "w", encoding='utf-8') as parents_file:
+    #     for idx, parent_list in enumerate(all_populated_comments_with_parents):
+    #         parents_file.write("Comment: " + str(idx) + "\n")
+    #         submission_data = parent_list.pop()
+    #         parents_file.write("Author: " + submission_data["author"] + " Post ID: " + submission_data["id"] +
+    #                            "\nTitle: " + submission_data["title"] +
+    #                            " Selftext: " + submission_data["selftext"] + "\n\n")
+    #         for meta_data in reversed(parent_list):
+    #             print()
+    #             parents_file.write("Author: " + meta_data["author"] + " Comment_ID: " + meta_data["comment_id"] +
+    #                                "\n" + "Body: " + meta_data["body"] + "\n\n")
+    #         parents_file.write("\n")
 
 
-def regroup():
-    first_pick = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\\"
-                                   r"Annotations\populated_agree_comments_with_parents_and_subission_post")
-    second_pick_indexes = [1, 3, 5, 6, 8, 9, 10, 12, 13, 14, 19, 21, 22, 23, 24, 25, 26, 27, 29, 30, 31, 32, 33, 35,
-                           36, 37, 38, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50, 54, 55, 60, 61, 62, 64, 66, 68, 69, 70,
-                           71, 72, 73, 74, 75, 76, 77, 82, 83, 85, 86, 87, 88, 89, 90, 91, 93, 94, 95, 96, 97, 99, 101,
-                           102, 103, 104, 107, 108, 109, 110, 112, 114, 115, 116, 117, 119, 121, 123, 124, 127, 128,
-                           133, 134, 135, 141, 142, 143, 144, 145, 147, 148, 149, 150, 152, 153, 154, 156, 157, 158,
-                           159, 160, 161, 162, 164, 165, 166, 168, 172, 173, 174, 176, 177, 178, 179, 180, 182, 183,
-                           184, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 200, 202, 205, 206, 208,
-                           209, 210, 211, 212, 213, 214, 215, 217, 219, 220, 221, 222, 223, 224, 227, 230, 231, 232,
-                           233, 234, 236, 238, 239, 240, 241, 242, 243, 244, 245, 246, 248, 249, 251, 252, 253, 254,
-                           255, 256, 258, 259, 260, 261, 263, 264]
-    print()
+def populate_opinion_change_comments_with_child_comments():
+    submission_and_parents = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                               r"Storm_on_capitol\Annotations\\"
+                                               r"populated_opinion_change_comments_with_parents_and_submission_post")
+    submissions_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                          r"Storm_on_capitol\Indexes\submissions_index")
+    # The opinion change comment is always the first for each list of comments in the submission and parents pickle.
+    # The submission is always the last on the list.
+    # The children of the opinion change comment will be added after the submission post.
+    for opinion_ch in submission_and_parents:
+        submission_id = opinion_ch[-1]["id"]
+        target_comment_id = opinion_ch[0]["comment_id"]
+        submission_comments = submissions_index[submission_id][1]
+
+        for comment in submission_comments:
+            if target_comment_id in comment["parent_id"]:
+                opinion_ch.append(comment)
+
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\Annotations\\"
+                      r"populated_opinion_change_comments_with_parents_children_and_submission_post",
+                      submission_and_parents)
 
 
 if __name__ == "__main__":
@@ -445,5 +475,6 @@ if __name__ == "__main__":
     # annotate()
     # opinion_changed()
     # group_opinion_changed_with_parent_child_comments()
-    regroup()
+    populate_opinion_change_comments_with_child_comments()
+
     print()
