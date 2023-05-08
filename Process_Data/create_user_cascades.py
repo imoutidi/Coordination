@@ -103,7 +103,7 @@ def scan_users():
             selftext = current_record[0]["selftext"]
             subreddit = current_record[0]["subreddit"]
             timestamp = tools.str_datetime_to_timestamp(current_record[0]["utc_datetime_str"])
-            snapshot_dict = {"author": author, "author_fullname": author_fullname,"id": sid, "title": title,
+            snapshot_dict = {"author": author, "author_fullname": author_fullname, "id": sid, "title": title,
                              "selftext": selftext, "subreddit": subreddit, "timestamp": timestamp, "score": score}
 
             if author_fullname in dictionary_of_usernames:
