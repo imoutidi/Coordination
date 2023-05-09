@@ -86,6 +86,7 @@ def create_comments_index():
                       , comments_dict)
 
 
+# Create an index of usernames
 def scan_users():
     list_of_irrelevant_usernames = ["t2_6l4z3", "t2_onl9u", "N_A"]
     records_path = r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\" \
@@ -181,18 +182,18 @@ def check_for_agreement_keywords():
                                                   r"Datasets\Storm_on_capitol\Users\frequent_users_and_their_posts")
     submission_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                                          r"Storm_on_capitol\Indexes\submissions_index")
-    # agreement_key_phrases = ["i agree", "you were right", "you are right", "you're right", "thats true", "that is true",
-    #                          "good point", "fair enough", "fair point", "you have a point", "you got a point",
-    #                          "excellent point", "excellent argument", "good argument", "exactly this", " +1 ",
-    #                          "ok got it", "got it", "i get it", "amen to that", "i see your point", "my bad",
-    #                          "i am wrong", "i'm wrong", "i was wrong", "i went wrong", "you’re correct",
-    #                          "you are correct", "i stand corrected"]
-    against_trump_key_phrases = ["i used to support trump but ", "i used to like trump ", " i voted for trump ",
-                                 "not voting for trump again ", " never again voting for trump ", " trump never again ",
-                                 " changed my mind about trump ", " i don't like trump anymore ",
-                                 " i was wrong voting for trump ", " changed my mind about trump ",
-                                 " don't support trump anymore ", " i am disappointed on trump ",
-                                 " i was wrong about trump ", " changed my view on trump ", " wrong on trump "]
+    agreement_key_phrases = ["i agree", "you were right", "you are right", "you're right", "thats true", "that is true",
+                             "good point", "fair enough", "fair point", "you have a point", "you got a point",
+                             "excellent point", "excellent argument", "good argument", "exactly this", " +1 ",
+                             "ok got it", "got it", "i get it", "amen to that", "i see your point", "my bad",
+                             "i am wrong", "i'm wrong", "i was wrong", "i went wrong", "you’re correct",
+                             "you are correct", "i stand corrected"]
+    # against_trump_key_phrases = ["i used to support trump but ", "i used to like trump ", " i voted for trump ",
+    #                              "not voting for trump again ", " never again voting for trump ", " trump never again ",
+    #                              " changed my mind about trump ", " i don't like trump anymore ",
+    #                              " i was wrong voting for trump ", " changed my mind about trump ",
+    #                              " don't support trump anymore ", " i am disappointed on trump ",
+    #                              " i was wrong about trump ", " changed my view on trump ", " wrong on trump "]
     for f_user_tuple in frequent_users_with_posts:
         for u_post in f_user_tuple[1]:
             # body means it is a comment.

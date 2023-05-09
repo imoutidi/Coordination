@@ -30,6 +30,7 @@ class TweetArchiver:
         full_text = tweet_object.full_text
         tweet_id = tweet_object.id
         tweet_date = tweet_object.created_at
+        # tweet_id will be an index in the database.
         try:
             self.collection.insert_one({"author_id": author_id, "author_username": author_username,
                                         "full_text": full_text, "tweet_id": tweet_id, "tweet_date": tweet_date})
