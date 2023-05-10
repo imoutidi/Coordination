@@ -199,7 +199,7 @@ def check_for_agreement_keywords():
             # body means it is a comment.
             if "body" in u_post:
                 post_text = u_post["body"].lower().replace("\n", "").strip()
-                for agree_phrase in against_trump_key_phrases:
+                for agree_phrase in agreement_key_phrases:
                     if agree_phrase in post_text:
                         # temp_agreeable_posts.append((f_user_tuple[0][0], u_post))
                         key_phrase_to_opinion_comment[agree_phrase].append((f_user_tuple[0][0], u_post))

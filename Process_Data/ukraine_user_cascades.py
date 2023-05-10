@@ -1,4 +1,5 @@
 import os
+import goto
 
 import colorama
 from dateutil.relativedelta import relativedelta
@@ -61,16 +62,116 @@ def create_comments_index():
 
 
 def scan_for_agreement_phrases():
+    key_phrase_to_opinion_comment = defaultdict(list)
+    agreement_key_phrases = ["i agree", "you were right", "you are right", "you're right", "thats true", "that is true",
+                             "good point", "fair enough", "fair point", "you have a point", "you got a point",
+                             "excellent point", "excellent argument", "good argument", "exactly this", " +1 ",
+                             "ok got it", "got it", "i get it", "amen to that", "i see your point", "my bad",
+                             "i am wrong", "i'm wrong", "i was wrong", "i went wrong", "you’re correct",
+                             "you are correct", "i stand corrected"]
     all_comments = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                                      r"Ukraine_War\Indexes\ukraine_comments_index")
-    opinion_change_comments = list()
     for comment_id, comment_attrs in all_comments.items():
-        if "my bad" in comment_attrs["body"]:
-            opinion_change_comments.append(comment_id)
-    print()
+        post_text = comment_attrs["body"].lower().replace("\n", "").strip()
+        for agree_phrase in agreement_key_phrases:
+            if agree_phrase in post_text:
+                comment_attrs["comment_id"] = comment_id
+                key_phrase_to_opinion_comment[agree_phrase].append(comment_attrs)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                      r"Ukraine_War\Comments\comments_with_agree_key_phrases", key_phrase_to_opinion_comment)
+
+
+def annotate():
+    # comment_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+    #                                   r"Ukraine_War\Annotations\comment_number")
+    comment_index = 0
+    index_counter = 0
+
+    # comments_to_keep = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+    #                                      r"Ukraine_War\Annotations\kept_comments")
+    comments_with_agree_keyphrase = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                                      r"Ukraine_War\Comments\comments_with_agree_key_phrases")
+    comments_to_keep = list()
+    break_flag = False
+    for keyphrase, comment_list in comments_with_agree_keyphrase.items():
+        for comment in comment_list:
+            print()
+            print_with_phrase_colored(comment["body"])
+            # print(comment["body"])
+            index_counter += 1
+            answer = input("Keep this comment?")
+            if answer == "Y":
+                comments_to_keep.append(comment)
+            if answer == "STOP":
+                break_flag = True
+                break
+        if break_flag:
+            break
+
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                      r"Ukraine_War\Annotations\kept_comments", comments_to_keep)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                      r"Ukraine_War\Annotations\comment_number", comment_index + index_counter - 1)
+
+
+def print_with_phrase_colored(in_str):
+    colorama.init()
+    agreement_key_phrases = ["i agree", "you were right", "you are right", "you're right", "thats true", "that is true",
+                             "good point", "fair enough", "fair point", "you have a point", "you got a point",
+                             "excellent point", "excellent argument", "good argument", "exactly this", " +1 ",
+                             "ok got it", "got it", "i get it", "amen to that", "i see your point", "my bad",
+                             "i am wrong", "i'm wrong", "i was wrong", "i went wrong", "you’re correct",
+                             "you are correct", "i stand corrected"]
+
+    for key_phrase in agreement_key_phrases:
+        substring_index = in_str.lower().find(key_phrase)
+        # print()
+        if substring_index != -1:
+            # The weird print is how colorama works.
+            print(in_str[:substring_index] +
+                  f"{Fore.GREEN}" +
+                  in_str[substring_index:substring_index + len(key_phrase)] +
+                  f"{Style.RESET_ALL}" +
+                  in_str[substring_index + len(key_phrase):])
+
+
+def group_opinion_changed_with_parent_child_comments():
+    comments_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                       r"Ukraine_War\Indexes\ukraine_comments_index")
+    opinion_changed_comments = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                                 r"Ukraine_War\Annotations\kept_comments")
+    # populate with parent comments
+    populated_with_parents = list()
+    for comment_meta in opinion_changed_comments:
+        group_of_comments = list()
+        group_of_comments.append(comment_meta)
+        parent_post_kind = comment_meta["parent_id"][0:2]
+        parent_post_id = comment_meta["parent_id"][3:]
+        while parent_post_kind == "t1":
+            parent_comment = comments_index[parent_post_id]
+            parent_comment["comment_id"] = parent_post_id
+            group_of_comments.append(parent_comment)
+            parent_post_kind = parent_comment["parent_id"][0:2]
+            parent_post_id = parent_comment["parent_id"][3:]
+        populated_with_parents.append(group_of_comments)
+    # populate_with_child_comments
+    for comment_group in populated_with_parents:
+        target_comment_id = comment_group[0]["comment_id"]
+        for comment_id, comment_meta in comments_index.items():
+            if target_comment_id in comment_meta["parent_id"]:
+                comment_meta["comment_id"] = comment_id
+                comment_meta["is_child"] = True
+                comment_group.append(comment_meta)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+                      r"Annotations\populated_opinion_change_comments_with_parents_children_and_submission_post",
+                      populated_with_parents)
 
 
 if __name__ == "__main__":
     # create_comments_index()
-    scan_for_agreement_phrases()
+    # scan_for_agreement_phrases()
+    # annotate()
+    # group_opinion_changed_with_parent_child_comments()
+    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+                          r"Annotations\populated_opinion_change_comments_with_parents_children_and_submission_post")
     print()
