@@ -167,11 +167,24 @@ def group_opinion_changed_with_parent_child_comments():
                       populated_with_parents)
 
 
+def write_permalinks():
+    comments = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                 r"Ukraine_War\Annotations\kept_comments")
+    with open(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+              r"Annotations\ukraine_permalinks.html", "w") as out_file:
+        for idx, comment in enumerate(comments):
+            url = comment["permalink"]
+            out_file.write(str(idx) + " <a href=" + url + ">" + url + "</a><br>")
+
+
+
+
 if __name__ == "__main__":
     # create_comments_index()
     # scan_for_agreement_phrases()
     # annotate()
     # group_opinion_changed_with_parent_child_comments()
-    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-                          r"Annotations\populated_opinion_change_comments_with_parents_children_and_submission_post")
+    write_permalinks()
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+    #                       r"Annotations\populated_opinion_change_comments_with_parents_children_and_submission_post")
     print()
