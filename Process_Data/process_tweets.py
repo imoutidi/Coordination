@@ -4,7 +4,7 @@ import tweepy
 # import editdistance
 # print(editdistance.eval('one banana', 'banana one'))
 import os
-
+import re
 import nltk
 # nltk.download('stopwords')  # download stopwords corpus
 # nltk.download('punkt')  # download punkt tokenizer
@@ -24,30 +24,41 @@ class TweetArchiver:
         self.client = MongoClient('localhost', 27017)
         self.db = self.client.Climate_Change_Tweets
         self.collection = self.db.tweet_documents
+        self.stop_words = set(stopwords.words('english'))
+        self.enrich_stopwords()
 
-    @staticmethod
-    def remove_stopwords(text):
-        stop_words = set(stopwords.words('english'))
+    def enrich_stopwords(self):
+        list_of_additional_words = ["it's", "we're", "...", "there's", "you're", "he's", "she's", "they're", "I'm"]
+        for s_word in list_of_additional_words:
+            self.stop_words.add(s_word)
+
+    def remove_stopwords(self, text):
         words = word_tokenize(text)
-        filtered_words = [word for word in words if word.lower() not in stop_words]
+        filtered_words = [word.lower() for word in words if word.lower() not in self.stop_words]
         filtered_text = ' '.join(filtered_words)
         return filtered_text
 
-    @staticmethod
-    def stop_words_and_lemmatize(text):
+    # TODO recheck for currency in the text, now it gets removed.
+    def stop_words_and_lemmatize(self, text):
+        # remove urls
+        text = re.sub(r'http\S+', '', text)
         # Tokenize the text
         words = word_tokenize(text)
 
         # Remove stopwords
-        stop_words = set(stopwords.words('english'))
-        filtered_words = [word for word in words if word.lower() not in stop_words]
+        self.stop_words = set(stopwords.words('english'))
+        filtered_words = [word for word in words if word.lower() not in self.stop_words]
 
         # Lemmatize the words
         lemmatizer = WordNetLemmatizer()
-        lemmatized_words = [lemmatizer.lemmatize(word) for word in filtered_words]
+        lemmatized_words = [lemmatizer.lemmatize(word.lower()) for word in filtered_words]
 
         # Join the words back into a string
         preprocessed_text = ' '.join(lemmatized_words)
+        preprocessed_text = re.sub(r'[\W\s]', ' ', preprocessed_text)
+        words2 = word_tokenize(preprocessed_text)
+        filtered_words = [word for word in words2 if len(word) > 1]
+        preprocessed_text = ' '.join(filtered_words)
         return preprocessed_text
 
     def parse_tweets(self):
@@ -69,10 +80,12 @@ class TweetArchiver:
         full_text = tweet_object.full_text
         tweet_id = tweet_object.id
         tweet_date = tweet_object.created_at
+        preprocessed_text = self.stop_words_and_lemmatize(full_text)
         # tweet_id will be an index in the database.
         try:
             self.collection.insert_one({"author_id": author_id, "author_username": author_username,
-                                        "full_text": full_text, "tweet_id": tweet_id, "tweet_date": tweet_date})
+                                        "full_text": full_text, "preprocessed_text": preprocessed_text,
+                                        "tweet_id": tweet_id, "tweet_date": tweet_date})
         except errors.DuplicateKeyError as key_error:
             print(key_error)
             print(tweet_id)
