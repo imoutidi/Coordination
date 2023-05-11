@@ -5,6 +5,7 @@ import tweepy
 # print(editdistance.eval('one banana', 'banana one'))
 import os
 import re
+from collections import defaultdict
 import nltk
 # nltk.download('stopwords')  # download stopwords corpus
 # nltk.download('punkt')  # download punkt tokenizer
@@ -90,8 +91,31 @@ class TweetArchiver:
             print(key_error)
             print(tweet_id)
 
+    def working_on_users(self):
+        # need to parse all tweets again to create user index of tweet ids
+        set_of_tweets = set()
+        user_to_tweets_posted_index = defaultdict(list)
+        user_id_to_username_index = dict()
+        for folder_index in range(16):
+            print(folder_index)
+            for filename in os.listdir(self.input_path + str(folder_index)):
+                tweet_records = tools.load_pickle(self.input_path + str(folder_index) + r"\\" + filename)
+                for tweet_obj in tweet_records:
+                    if tweet_obj.id in set_of_tweets:
+                        continue
+                    else:
+                        user_to_tweets_posted_index[tweet_obj.author.id].append(tweet_obj.id)
+                        if tweet_obj.author.id not in user_id_to_username_index:
+                            user_id_to_username_index[tweet_obj.author.id] = tweet_obj.author.name
+        # save indexes
+        tools.save_pickle(self.output_path + r"Indexes\user_id_to_tweets_ids_posted", user_to_tweets_posted_index)
+        tools.save_pickle(self.output_path + r"Indexes\user_id_to_username", user_id_to_username_index)
+
 
 if __name__ == "__main__":
     climate_change_archiver = TweetArchiver()
-    climate_change_archiver.parse_tweets()
+    # climate_change_archiver.parse_tweets()
+    # climate_change_archiver.working_on_users()
+    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Climate_Changed\I_O\Indexes\user_id_to_tweets_ids_posted")
+    b = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Climate_Changed\I_O\Indexes\user_id_to_username")
     print()

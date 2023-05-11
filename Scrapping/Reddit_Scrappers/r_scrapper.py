@@ -40,7 +40,7 @@ def get_post_with_id(post_id="125udaj"):
     return post
 
 
-# Getting submission ids for 6 hour time interval for a give date range
+# Getting submission ids for 6 hour time interval for a given date range
 def get_submissions_records_for_time_range(start_date_str, end_date_str, subreddit_name, query=None):
     hour_interval = 3
     start_date_obj = datetime.datetime.strptime(start_date_str, "%Y-%m-%d")
@@ -131,8 +131,8 @@ def get_submissions_records_for_time_range(start_date_str, end_date_str, subredd
         print(earlier_date)
         earlier_date = later_date
         later_date += relativedelta(hours=hour_interval)
-    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\r_"
-                      + subreddit_name + "_submission_records", submission_records)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\New_Submissions\\"
+                      + subreddit_name + "_" + start_date_str + "_" + end_date_str, submission_records)
 
 
 def date_converter(date_obj):
@@ -225,8 +225,8 @@ def retrieve_comments_ids_per_submission():
 if __name__ == "__main__":
     # getPushshiftData()
     # get_post_with_id()
-    # get_submissions_records_for_time_range("2020-12-01", "2021-01-01", "health", "covid")
-    retrieve_comments_ids_per_submission()
+    get_submissions_records_for_time_range("2023-01-01", "2023-04-01", "worldnews", "ukraine+russia")
+    # retrieve_comments_ids_per_submission()
     # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\Comments\submission_id_to_comments_dict10")
     # b = get_post_with_id("119wltg")
     print()
