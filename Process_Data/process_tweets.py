@@ -115,7 +115,8 @@ class TweetArchiver:
         user_id_to_super_documents = dict()
         for user_id, tweet_id_list in user_to_tweets_posted_index.items():
             user_doc_string = ""
-            for tweet_id in tweet_id_list:
+            print(len(tweet_id_list))
+            for idx, tweet_id in enumerate(tweet_id_list):
                 tweet_record = self.collection.find_one({"tweet_id": tweet_id})
                 user_doc_string += tweet_record["preprocessed_text"] + " "
             user_id_to_super_documents[user_id] = user_doc_string
@@ -125,7 +126,7 @@ class TweetArchiver:
 if __name__ == "__main__":
     climate_change_archiver = TweetArchiver()
     # climate_change_archiver.parse_tweets()
-    climate_change_archiver.working_on_users()
+    # climate_change_archiver.working_on_users()
     climate_change_archiver.create_super_documents()
 
     print()
