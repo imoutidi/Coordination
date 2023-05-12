@@ -6,6 +6,7 @@ import tweepy
 import os
 import re
 from collections import defaultdict
+import pprint
 import nltk
 # nltk.download('stopwords')  # download stopwords corpus
 # nltk.download('punkt')  # download punkt tokenizer
@@ -29,7 +30,8 @@ class TweetArchiver:
         self.enrich_stopwords()
 
     def enrich_stopwords(self):
-        list_of_additional_words = ["it's", "we're", "...", "there's", "you're", "he's", "she's", "they're", "I'm"]
+        list_of_additional_words = ["it's", "we're", "...", "there's", "you're", "he's",
+                                    "she's", "they're", "I'm", "rt"]
         for s_word in list_of_additional_words:
             self.stop_words.add(s_word)
 
@@ -69,9 +71,7 @@ class TweetArchiver:
             for filename in os.listdir(self.input_path + str(folder_index)):
                 tweet_records = tools.load_pickle(self.input_path + str(folder_index) + r"\\" + filename)
                 for tweet_obj in tweet_records:
-                    if tweet_obj.id in set_of_tweets:
-                        continue
-                    else:
+                    if tweet_obj.id not in set_of_tweets:
                         set_of_tweets.add(tweet_obj.id)
                         self.mongo_insert(tweet_obj)
 
@@ -101,9 +101,7 @@ class TweetArchiver:
             for filename in os.listdir(self.input_path + str(folder_index)):
                 tweet_records = tools.load_pickle(self.input_path + str(folder_index) + r"\\" + filename)
                 for tweet_obj in tweet_records:
-                    if tweet_obj.id in set_of_tweets:
-                        continue
-                    else:
+                    if tweet_obj.id not in set_of_tweets:
                         user_to_tweets_posted_index[tweet_obj.author.id].append(tweet_obj.id)
                         if tweet_obj.author.id not in user_id_to_username_index:
                             user_id_to_username_index[tweet_obj.author.id] = tweet_obj.author.name
@@ -111,11 +109,23 @@ class TweetArchiver:
         tools.save_pickle(self.output_path + r"Indexes\user_id_to_tweets_ids_posted", user_to_tweets_posted_index)
         tools.save_pickle(self.output_path + r"Indexes\user_id_to_username", user_id_to_username_index)
 
+    def create_super_documents(self):
+        user_to_tweets_posted_index = tools.load_pickle(self.output_path + r"Indexes\user_id_to_tweets_ids_posted")
+        # retrieve documents from the mongodb
+        user_id_to_super_documents = dict()
+        for user_id, tweet_id_list in user_to_tweets_posted_index.items():
+            user_doc_string = ""
+            for tweet_id in tweet_id_list:
+                tweet_record = self.collection.find_one({"tweet_id": tweet_id})
+                user_doc_string += tweet_record["preprocessed_text"] + " "
+            user_id_to_super_documents[user_id] = user_doc_string
+            print()
+
 
 if __name__ == "__main__":
     climate_change_archiver = TweetArchiver()
     # climate_change_archiver.parse_tweets()
-    # climate_change_archiver.working_on_users()
-    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Climate_Changed\I_O\Indexes\user_id_to_tweets_ids_posted")
-    b = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Climate_Changed\I_O\Indexes\user_id_to_username")
+    climate_change_archiver.working_on_users()
+    climate_change_archiver.create_super_documents()
+
     print()

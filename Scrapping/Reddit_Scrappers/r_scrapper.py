@@ -141,8 +141,10 @@ def date_converter(date_obj):
 
 
 def retrieve_comments_ids_per_submission():
-    period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Twitter_Parser\I_O\\"
-                                       r"Politics\January_6_United_States_Capitol_attack\submission_records")
+    period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+                                       r"New_Submissions\worldnews_2022-01-01_2022-05-01")
+    # period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Twitter_Parser\I_O\\"
+    #                                    r"Politics\January_6_United_States_Capitol_attack\submission_records")
     # period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\\"
     #                                    r"r_science_submission_records")
 
@@ -150,22 +152,22 @@ def retrieve_comments_ids_per_submission():
     idx_correction = 0
     submission_id_to_comments_dict = dict()
     for idx, sub_record in enumerate(period_records[idx_correction:]):
-        if (idx + idx_correction) % 10 == 0:
+        if (idx + idx_correction) % 1000 == 0:
             print("Saved until idx:" + str(idx + idx_correction))
-            tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\\"
-                              r"Comments\submission_id_to_comments_dict"
+            tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+                              r"Comments\New_Comments\comments_2022-05-01_"
                               + str(idx + idx_correction), submission_id_to_comments_dict)
             submission_id_to_comments_dict = dict()
         comment_list = list()
         try:
             submission = reddit.submission(sub_record["id"])
-            print()
+            # print()
         except Forbidden as f_error:
             print(f_error)
         # submission.comments.replace_more(limit=None, threshold=0)
         for comment in submission.comments.list():
-            for reply in comment.replies.list():
-                print()
+            # for reply in comment.replies.list():
+            #     print()
             comment_record_dict = dict()
             if "id" in comment.__dict__:
                 comment_record_dict["id"] = comment.__dict__["id"]
@@ -206,9 +208,8 @@ def retrieve_comments_ids_per_submission():
             comment_list.append(comment_record_dict)
         submission_id_to_comments_dict[sub_record["id"]] = comment_list
         time.sleep(4)
-    # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Twitter_Parser\I_O\Politics\\"
-    #                   r"January 6 United States Capitol attack\submission_id_to_comments_dict",
-    #                   submission_id_to_comments_dict)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+                              r"Comments\New_Comments\comments_2022-05-01_last", submission_id_to_comments_dict)
 
     # ///////////////////////////////////////////////////////////
     # pushshift comment_ids is broken at the moment
@@ -225,9 +226,9 @@ def retrieve_comments_ids_per_submission():
 if __name__ == "__main__":
     # getPushshiftData()
     # get_post_with_id()
-    get_submissions_records_for_time_range("2023-01-01", "2023-04-01", "worldnews", "ukraine+russia")
-    # retrieve_comments_ids_per_submission()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\Comments\submission_id_to_comments_dict10")
+    # get_submissions_records_for_time_range("2023-01-01", "2023-04-01", "worldnews", "ukraine+russia")
+    retrieve_comments_ids_per_submission()
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\New_Submissions\worldnews_2022-01-01_2022-05-01")
     # b = get_post_with_id("119wltg")
     print()
 
