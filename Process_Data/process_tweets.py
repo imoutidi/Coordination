@@ -12,6 +12,7 @@ import nltk
 # nltk.download('punkt')  # download punkt tokenizer
 # nltk.download('wordnet')  # download WordNet lemmatizer
 
+import numpy as np
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
@@ -133,25 +134,62 @@ class TweetArchiver:
             self.superdocs.insert_one({"author_id": user_id, "super_document": user_doc_string,
                                        "number_of_tweets": len(tweet_id_list)})
 
-    def vectorize_documents(self):
-        cursor = self.superdocs.find({})
-        # for document in cursor:
-        #     print(document)
-        sample_text1 = "The dem party won the presidential elections for the third time in a row on 2022. A lot of people liked that"
-        sample_text2 = "The dem party won the presidential elections for the third time in a row on 2022. A lot of people liked that"
-        tokens1 = self.tokenizer.encode_plus(sample_text1, add_special_tokens=True, return_tensors='pt')
-        tokens2 = self.tokenizer.encode_plus(sample_text2, add_special_tokens=True, return_tensors='pt')
-        with torch.no_grad():
-            outputs1 = self.model(**tokens1)
-            embeddings1 = outputs1.last_hidden_state
-            outputs2 = self.model(**tokens2)
-            embeddings2 = outputs2.last_hidden_state
+    # Calculates bert vectors for the super-documents and stores them in mongodb converted as text.
+    def calculate_text_bert_vectors(self):
+        # We need no_cursor_timeout=True because otherwise the cursor times out after ten minutes
+        # Always remember to add also cursor.close() after the job is done.
+        # The cursor can stiil close after 30 minutes because FML and this:
+        # https://www.mongodb.com/docs/v4.4/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout
+        cursor = self.superdocs.find({}, no_cursor_timeout=True)
+        all_author_ids = list()
+        for count, document in enumerate(cursor):
+            all_author_ids.append(document["author_id"])
+        cursor.close()
+        counter = 34557
+        for author_id in all_author_ids[34557:]:
+            print(counter)
+            counter += 1
+            super_doc_record = self.superdocs.find_one({"author_id": author_id})
+            vector = self.doc_vectorizer(super_doc_record["super_document"])
+            string_vector = self.vector_to_string(vector)
+            self.superdocs.update_one({"author_id": author_id}, {"$set": {"bert_vector": string_vector}})
 
-        # Convert embeddings to a vector by averaging across tokens
-        vector1 = torch.mean(embeddings1, dim=1)
-        vector2 = torch.mean(embeddings2, dim=1)
-        similarity = cosine_similarity(vector1, vector2)
-        print(similarity[0][0])
+        # similarity = cosine_similarity(vector1, vector2)
+        # print(similarity[0][0])
+
+    @staticmethod
+    def vector_to_string(nd_vector):
+        vector_string = ""
+        for value in nd_vector[:-1]:
+            vector_string += str(value) + ","
+        vector_string += str(nd_vector[-1])
+        return vector_string
+
+    @staticmethod
+    def string_to_vector(str_vector):
+        vector_nums = str_vector.split(",")
+        list_of_nums = [float(x) for x in vector_nums]
+        np_vector = np.asarray(list_of_nums, dtype=np.float64)
+        return np_vector
+
+    def doc_vectorizer(self, document):
+        max_chunk_length = 512
+        chunks = [document[i:i + max_chunk_length] for i in range(0, len(document), max_chunk_length)]
+        embeddings = np.zeros((len(chunks), max_chunk_length, 768))
+
+        with torch.no_grad():
+            for i, chunk in enumerate(chunks):
+                # Tokenize the chunk and add special [CLS] and [SEP] tokens
+                tokens = self.tokenizer.encode_plus(chunk, add_special_tokens=True, return_tensors='pt')
+                # Get the BERT embeddings for the tokens
+                outputs = self.model(**tokens)
+                chunk_embeddings = outputs.last_hidden_state
+                # Copy the embeddings into the embeddings array
+                embeddings[i, :chunk_embeddings.shape[1], :] = chunk_embeddings.squeeze().numpy()
+
+        # Average the embeddings across chunks to obtain a single vector representation for the entire document
+        document_vector = np.mean(embeddings, axis=(0, 1))
+        return document_vector
 
 
 if __name__ == "__main__":
@@ -159,5 +197,6 @@ if __name__ == "__main__":
     # climate_change_archiver.parse_tweets()
     # climate_change_archiver.working_on_users()
     # climate_change_archiver.create_super_documents()
-    climate_change_archiver.vectorize_documents()
+    # climate_change_archiver.doc_vectorizer("tt")
+    climate_change_archiver.calculate_text_bert_vectors()
     print()
