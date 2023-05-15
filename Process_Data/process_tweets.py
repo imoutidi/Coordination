@@ -15,6 +15,11 @@ import nltk
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from sklearn.metrics.pairwise import cosine_similarity
+
+import torch
+from transformers import BertTokenizer, BertModel
+
 
 
 class TweetArchiver:
@@ -26,8 +31,11 @@ class TweetArchiver:
         self.client = MongoClient('localhost', 27017)
         self.db = self.client.Climate_Change_Tweets
         self.collection = self.db.tweet_documents
+        self.superdocs = self.db.super_documents
         self.stop_words = set(stopwords.words('english'))
         self.enrich_stopwords()
+        self.model = BertModel.from_pretrained('bert-base-uncased')
+        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
     def enrich_stopwords(self):
         list_of_additional_words = ["it's", "we're", "...", "there's", "you're", "he's",
@@ -112,21 +120,44 @@ class TweetArchiver:
     def create_super_documents(self):
         user_to_tweets_posted_index = tools.load_pickle(self.output_path + r"Indexes\user_id_to_tweets_ids_posted")
         # retrieve documents from the mongodb
-        user_id_to_super_documents = dict()
+        counter = 0
+        print(len(user_to_tweets_posted_index))
         for user_id, tweet_id_list in user_to_tweets_posted_index.items():
+            print(counter)
+            counter += 1
             user_doc_string = ""
-            print(len(tweet_id_list))
             for idx, tweet_id in enumerate(tweet_id_list):
                 tweet_record = self.collection.find_one({"tweet_id": tweet_id})
-                user_doc_string += tweet_record["preprocessed_text"] + " "
-            user_id_to_super_documents[user_id] = user_doc_string
-            print()
+                user_doc_string += tweet_record["preprocessed_text"].replace("rt", "") + " "
+            # user_id_to_super_documents[user_id] = user_doc_string
+            self.superdocs.insert_one({"author_id": user_id, "super_document": user_doc_string,
+                                       "number_of_tweets": len(tweet_id_list)})
+
+    def vectorize_documents(self):
+        cursor = self.superdocs.find({})
+        # for document in cursor:
+        #     print(document)
+        sample_text1 = "The dem party won the presidential elections for the third time in a row on 2022. A lot of people liked that"
+        sample_text2 = "The dem party won the presidential elections for the third time in a row on 2022. A lot of people liked that"
+        tokens1 = self.tokenizer.encode_plus(sample_text1, add_special_tokens=True, return_tensors='pt')
+        tokens2 = self.tokenizer.encode_plus(sample_text2, add_special_tokens=True, return_tensors='pt')
+        with torch.no_grad():
+            outputs1 = self.model(**tokens1)
+            embeddings1 = outputs1.last_hidden_state
+            outputs2 = self.model(**tokens2)
+            embeddings2 = outputs2.last_hidden_state
+
+        # Convert embeddings to a vector by averaging across tokens
+        vector1 = torch.mean(embeddings1, dim=1)
+        vector2 = torch.mean(embeddings2, dim=1)
+        similarity = cosine_similarity(vector1, vector2)
+        print(similarity[0][0])
 
 
 if __name__ == "__main__":
     climate_change_archiver = TweetArchiver()
     # climate_change_archiver.parse_tweets()
     # climate_change_archiver.working_on_users()
-    climate_change_archiver.create_super_documents()
-
+    # climate_change_archiver.create_super_documents()
+    climate_change_archiver.vectorize_documents()
     print()
