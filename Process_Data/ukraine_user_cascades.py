@@ -176,6 +176,19 @@ def write_permalinks():
             url = comment["permalink"]
             out_file.write(str(idx) + " <a href=" + url + ">" + url + "</a><br>")
 
+def check_comments():
+    input_path = r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\New_Comments\\"
+    submission_counter = 0
+    comment_counter = 0
+    for filename in os.listdir(input_path):
+        ukr_comment = tools.load_pickle(input_path + filename)
+        submission_counter += len(ukr_comment)
+        for sub_id, comments in ukr_comment.items():
+            comment_counter += len(comments)
+    print(submission_counter)
+    print(comment_counter)
+
+
 
 
 
@@ -184,7 +197,8 @@ if __name__ == "__main__":
     # scan_for_agreement_phrases()
     # annotate()
     # group_opinion_changed_with_parent_child_comments()
-    write_permalinks()
+    # write_permalinks()
     # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
     #                       r"Annotations\populated_opinion_change_comments_with_parents_children_and_submission_post")
+    check_comments()
     print()
