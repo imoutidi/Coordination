@@ -21,7 +21,7 @@ from colorama import Style
 def create_comments_index():
     comments_dict = dict()
     all_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-                                    r"Comments\submission_id_to_comments_tjcwy9")
+                                    r"New_Comments\worldnews_2022-01-01_2023-04-01")
 
     for current_record, submission_comments in all_records.items():
         sid = current_record
@@ -58,7 +58,7 @@ def create_comments_index():
                                "score": c_score, "parent_id": c_parent_id, "permalink": c_perma}
             comments_dict[c_sid] = c_snapshot_dict
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-                      r"Indexes\ukraine_comments_index", comments_dict)
+                      r"Indexes\new_ukraine_comments_index", comments_dict)
 
 
 def scan_for_agreement_phrases():
@@ -70,7 +70,7 @@ def scan_for_agreement_phrases():
                              "i am wrong", "i'm wrong", "i was wrong", "i went wrong", "you’re correct",
                              "you are correct", "i stand corrected"]
     all_comments = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                                     r"Ukraine_War\Indexes\ukraine_comments_index")
+                                     r"Ukraine_War\Indexes\new_ukraine_comments_index")
     for comment_id, comment_attrs in all_comments.items():
         post_text = comment_attrs["body"].lower().replace("\n", "").strip()
         for agree_phrase in agreement_key_phrases:
@@ -78,19 +78,19 @@ def scan_for_agreement_phrases():
                 comment_attrs["comment_id"] = comment_id
                 key_phrase_to_opinion_comment[agree_phrase].append(comment_attrs)
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                      r"Ukraine_War\Comments\comments_with_agree_key_phrases", key_phrase_to_opinion_comment)
+                      r"Ukraine_War\Comments\New_Comments\agree_key_phrases", key_phrase_to_opinion_comment)
 
 
 def annotate():
     # comment_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-    #                                   r"Ukraine_War\Annotations\comment_number")
+    #                                   r"Ukraine_War\Annotations\new_comment_number")
     comment_index = 0
     index_counter = 0
 
     # comments_to_keep = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-    #                                      r"Ukraine_War\Annotations\kept_comments")
+    #                                      r"Ukraine_War\Annotations\new_kept_comments")
     comments_with_agree_keyphrase = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                                                      r"Ukraine_War\Comments\comments_with_agree_key_phrases")
+                                                      r"Ukraine_War\Comments\New_Comments\agree_key_phrases")
     comments_to_keep = list()
     break_flag = False
     for keyphrase, comment_list in comments_with_agree_keyphrase.items():
@@ -108,10 +108,10 @@ def annotate():
         if break_flag:
             break
 
-    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                      r"Ukraine_War\Annotations\kept_comments", comments_to_keep)
-    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                      r"Ukraine_War\Annotations\comment_number", comment_index + index_counter - 1)
+    # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+    #                   r"Ukraine_War\Annotations\new_kept_comments", comments_to_keep)
+    # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+    #                   r"Ukraine_War\Annotations\new_comment_number", comment_index + index_counter - 1)
 
 
 def print_with_phrase_colored(in_str):
@@ -176,29 +176,24 @@ def write_permalinks():
             url = comment["permalink"]
             out_file.write(str(idx) + " <a href=" + url + ">" + url + "</a><br>")
 
-def check_comments():
+
+def merge_submissions():
+    merge_dict = dict()
     input_path = r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\New_Comments\\"
-    submission_counter = 0
-    comment_counter = 0
     for filename in os.listdir(input_path):
-        ukr_comment = tools.load_pickle(input_path + filename)
-        submission_counter += len(ukr_comment)
-        for sub_id, comments in ukr_comment.items():
-            comment_counter += len(comments)
-    print(submission_counter)
-    print(comment_counter)
+        comments_per_submission = tools.load_pickle(input_path + filename)
+        for sid, s_comments in comments_per_submission.items():
+            merge_dict[sid] = s_comments
 
-
-
+    tools.save_pickle(input_path + "worldnews_2022-01-01_2023-04-01", merge_dict)
 
 
 if __name__ == "__main__":
     # create_comments_index()
     # scan_for_agreement_phrases()
-    # annotate()
+    annotate()
     # group_opinion_changed_with_parent_child_comments()
     # write_permalinks()
     # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-    #                       r"Annotations\populated_opinion_change_comments_with_parents_children_and_submission_post")
-    check_comments()
+    #                       r"Comments\New_Comments\agree_key_phrases")
     print()
