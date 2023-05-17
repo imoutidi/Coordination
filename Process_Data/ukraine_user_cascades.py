@@ -1,4 +1,5 @@
 import os
+import math
 import goto
 
 import colorama
@@ -98,9 +99,11 @@ def annotate():
 
     for comment in merged_comment_list[comment_index:]:
         print(comment_index + index_counter)
+        index_counter += 1
+        if "i agree" in comment["body"].lower():
+            continue
         print_with_phrase_colored(comment["body"])
         # print(comment["body"])
-        index_counter += 1
         answer = input("Keep this comment?")
         if answer == "Y":
             comments_to_keep.append(comment)
@@ -122,17 +125,32 @@ def print_with_phrase_colored(in_str):
                              "i am wrong", "i'm wrong", "i was wrong", "i went wrong", "you’re correct",
                              "you are correct", "i stand corrected"]
 
+    characters_per_line = 180
+    words = in_str.split()
+    in_str_with_linebreaks = ""
+    current_line_length = 0
+
+    for word in words:
+        word_length = len(word)
+        if current_line_length + word_length <= characters_per_line:
+            in_str_with_linebreaks += word + " "
+            current_line_length += word_length + 1
+        else:
+            in_str_with_linebreaks = in_str_with_linebreaks.rstrip() + "\n\n" + word + " "
+            current_line_length = word_length + 1
+
     for key_phrase in agreement_key_phrases:
-        substring_index = in_str.lower().find(key_phrase)
+        substring_index = in_str_with_linebreaks.lower().find(key_phrase)
         # print()
         if substring_index != -1:
             # The weird print is how colorama works.
-            print(in_str[:substring_index] +
+            print(in_str_with_linebreaks[:substring_index] +
                   f"{Fore.GREEN}" +
-                  in_str[substring_index:substring_index + len(key_phrase)] +
+                  in_str_with_linebreaks[substring_index:substring_index + len(key_phrase)] +
                   f"{Style.RESET_ALL}" +
-                  in_str[substring_index + len(key_phrase):])
-
+                  in_str_with_linebreaks[substring_index + len(key_phrase):])
+            # this is for better posture
+            print("\n\n\n\n\n\n\n\n\n\n\n\n")
 
 def group_opinion_changed_with_parent_child_comments():
     comments_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
@@ -193,6 +211,6 @@ if __name__ == "__main__":
     annotate()
     # group_nopinion_changed_with_parent_child_comments()
     # write_permalinks()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\
-    # Ukraine_War\Annotations\new_kept_comments")
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+    #                       r"Ukraine_War\Annotations\new_kept_comments")
     print()
