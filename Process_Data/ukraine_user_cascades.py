@@ -82,36 +82,35 @@ def scan_for_agreement_phrases():
 
 
 def annotate():
-    # comment_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-    #                                   r"Ukraine_War\Annotations\new_comment_number")
-    comment_index = 0
+    comment_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                      r"Ukraine_War\Annotations\new_comment_number")
+    # comment_index = 0
     index_counter = 0
 
-    # comments_to_keep = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-    #                                      r"Ukraine_War\Annotations\new_kept_comments")
+    comments_to_keep = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                                         r"Ukraine_War\Annotations\new_kept_comments")
     comments_with_agree_keyphrase = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                                                       r"Ukraine_War\Comments\New_Comments\agree_key_phrases")
-    comments_to_keep = list()
-    break_flag = False
+    # comments_to_keep = list()
+    merged_comment_list = list()
     for keyphrase, comment_list in comments_with_agree_keyphrase.items():
-        for comment in comment_list:
-            print()
-            print_with_phrase_colored(comment["body"])
-            # print(comment["body"])
-            index_counter += 1
-            answer = input("Keep this comment?")
-            if answer == "Y":
-                comments_to_keep.append(comment)
-            if answer == "STOP":
-                break_flag = True
-                break
-        if break_flag:
+        merged_comment_list += comment_list
+
+    for comment in merged_comment_list[comment_index:]:
+        print(comment_index + index_counter)
+        print_with_phrase_colored(comment["body"])
+        # print(comment["body"])
+        index_counter += 1
+        answer = input("Keep this comment?")
+        if answer == "Y":
+            comments_to_keep.append(comment)
+        if answer == "STOP":
             break
 
-    # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-    #                   r"Ukraine_War\Annotations\new_kept_comments", comments_to_keep)
-    # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-    #                   r"Ukraine_War\Annotations\new_comment_number", comment_index + index_counter - 1)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                      r"Ukraine_War\Annotations\new_kept_comments", comments_to_keep)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
+                      r"Ukraine_War\Annotations\new_comment_number", comment_index + index_counter - 1)
 
 
 def print_with_phrase_colored(in_str):
@@ -192,8 +191,8 @@ if __name__ == "__main__":
     # create_comments_index()
     # scan_for_agreement_phrases()
     annotate()
-    # group_opinion_changed_with_parent_child_comments()
+    # group_nopinion_changed_with_parent_child_comments()
     # write_permalinks()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-    #                       r"Comments\New_Comments\agree_key_phrases")
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\
+    # Ukraine_War\Annotations\new_kept_comments")
     print()
