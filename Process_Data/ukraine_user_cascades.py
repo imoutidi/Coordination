@@ -207,6 +207,7 @@ def merge_submissions():
 
 if __name__ == "__main__":
     # create_comments_index()
+
     # scan_for_agreement_phrases()
     annotate()
     # group_nopinion_changed_with_parent_child_comments()
