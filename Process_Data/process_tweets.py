@@ -141,12 +141,16 @@ class TweetArchiver:
         # The cursor can stiil close after 30 minutes because FML and this:
         # https://www.mongodb.com/docs/v4.4/reference/method/cursor.noCursorTimeout/#session-idle-timeout-overrides-nocursortimeout
         cursor = self.superdocs.find({}, no_cursor_timeout=True)
-        all_author_ids = list()
-        for count, document in enumerate(cursor):
-            all_author_ids.append(document["author_id"])
+        all_author_ids = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Climate_Changed\\"
+                                           r"I_O\bin\all_authors_ids")
+        # all_author_ids = list()
+        # for count, document in enumerate(cursor):
+        #     all_author_ids.append(document["author_id"])
+        # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Climate_Changed\\"
+        #                   r"I_O\bin\all_authors_ids", all_author_ids)
         cursor.close()
-        counter = 34557
-        for author_id in all_author_ids[34557:]:
+        counter = 2773930
+        for author_id in all_author_ids[2773930:]:
             print(counter)
             counter += 1
             super_doc_record = self.superdocs.find_one({"author_id": author_id})
