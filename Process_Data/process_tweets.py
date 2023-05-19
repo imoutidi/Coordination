@@ -25,8 +25,7 @@ from transformers import BertTokenizer, BertModel
 
 class TweetArchiver:
     def __init__(self):
-        self.path = r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\" \
-                          r"Climate_Changed\\"
+        self.path = r"C:\Users\irmo\PycharmProjects\Climate_Change_Twitter\I_O\Datasets\Climate_Changed\\"
         self.input_path = self.path + r"Downloaded_Tweets\\"
         self.output_path = self.path + r"I_O\\"
         self.client = MongoClient('localhost', 27017)
@@ -149,8 +148,8 @@ class TweetArchiver:
         # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Climate_Changed\\"
         #                   r"I_O\bin\all_authors_ids", all_author_ids)
         cursor.close()
-        counter = 2773930
-        for author_id in all_author_ids[2773930:]:
+        counter = 0
+        for author_id in all_author_ids:
             print(counter)
             counter += 1
             super_doc_record = self.superdocs.find_one({"author_id": author_id})
@@ -195,6 +194,30 @@ class TweetArchiver:
         document_vector = np.mean(embeddings, axis=(0, 1))
         return document_vector
 
+    def manual_adding_records(self):
+        all_author_ids = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Climate_Change_Twitter\I_O\\"
+                                           r"Datasets\Climate_Changed\I_O\bin\all_authors_ids")
+        target_id = all_author_ids[2627414]
+        print()
+
+    # Pruning users with less than X amount of tweets.
+    def gather_user_ids_with_many_tweets(self, number_of_tweets):
+        list_of_user_ids_with_many_tweets = list()
+        all_author_ids = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Climate_Change_Twitter\I_O\\"
+                                           r"Datasets\Climate_Changed\I_O\bin\all_authors_ids")
+        for idx, author_id in enumerate(all_author_ids):
+            super_doc_record = self.superdocs.find_one({"author_id": author_id})
+            try:
+                if super_doc_record["number_of_tweets"] > number_of_tweets:
+                    list_of_user_ids_with_many_tweets.append(author_id)
+            except Exception as e:
+                print(e)
+                print(idx)
+                print(super_doc_record)
+        tools.save_pickle(self.output_path + r"bin\authors_with_more_than_"
+                          + str(number_of_tweets) + "_tweets", list_of_user_ids_with_many_tweets)
+        print(len(list_of_user_ids_with_many_tweets))
+
 
 if __name__ == "__main__":
     climate_change_archiver = TweetArchiver()
@@ -202,5 +225,7 @@ if __name__ == "__main__":
     # climate_change_archiver.working_on_users()
     # climate_change_archiver.create_super_documents()
     # climate_change_archiver.doc_vectorizer("tt")
-    climate_change_archiver.calculate_text_bert_vectors()
+    # climate_change_archiver.calculate_text_bert_vectors()
+    # climate_change_archiver.manual_adding_records()
+    climate_change_archiver.gather_user_ids_with_many_tweets(10)
     print()
