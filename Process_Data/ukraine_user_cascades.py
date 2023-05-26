@@ -19,6 +19,17 @@ from colorama import Fore
 from colorama import Style
 
 
+def create_submission_index():
+
+    all_submissions = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+                                        r"New_Submissions\worldnews_subs_2022-01-01_2023-04-01")
+    submissions_index = dict()
+    for sub in all_submissions:
+        submissions_index["id"] = sub
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+                      r"Indexes\submissions_index", submissions_index)
+
+
 def create_comments_index():
     comments_dict = dict()
     all_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
@@ -152,11 +163,12 @@ def print_with_phrase_colored(in_str):
             # this is for better posture
             print("\n\n\n\n\n\n\n\n\n\n\n\n")
 
+
 def group_opinion_changed_with_parent_child_comments():
     comments_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                                       r"Ukraine_War\Indexes\ukraine_comments_index")
+                                       r"Ukraine_War\Indexes\new_ukraine_comments_index")
     opinion_changed_comments = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                                                 r"Ukraine_War\Annotations\kept_comments")
+                                                 r"Ukraine_War\Annotations\new_kept_comments")
     # populate with parent comments
     populated_with_parents = list()
     for comment_meta in opinion_changed_comments:
@@ -180,7 +192,7 @@ def group_opinion_changed_with_parent_child_comments():
                 comment_meta["is_child"] = True
                 comment_group.append(comment_meta)
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-                      r"Annotations\populated_opinion_change_comments_with_parents_children_and_submission_post",
+                      r"Annotations\new_populated_opinion_change_comments_with_parents_children_and_submission_post",
                       populated_with_parents)
 
 
@@ -195,23 +207,24 @@ def write_permalinks():
 
 
 def merge_submissions():
-    merge_dict = dict()
-    input_path = r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\New_Comments\\"
+    all_submissions = list()
+    input_path = r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\New_Submissions\\"
     for filename in os.listdir(input_path):
-        comments_per_submission = tools.load_pickle(input_path + filename)
-        for sid, s_comments in comments_per_submission.items():
-            merge_dict[sid] = s_comments
+        submissions = tools.load_pickle(input_path + filename)
+        for sub in submissions:
+            all_submissions.append(sub)
 
-    tools.save_pickle(input_path + "worldnews_2022-01-01_2023-04-01", merge_dict)
+    tools.save_pickle(input_path + "worldnews_subs_2022-01-01_2023-04-01", all_submissions)
 
 
 if __name__ == "__main__":
     # create_comments_index()
-
+    # create_submission_index()
+    # merge_submissions()
     # scan_for_agreement_phrases()
-    annotate()
-    # group_nopinion_changed_with_parent_child_comments()
+    # annotate()
+    group_opinion_changed_with_parent_child_comments()
     # write_permalinks()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-    #                       r"Ukraine_War\Annotations\new_kept_comments")
+
+
     print()
