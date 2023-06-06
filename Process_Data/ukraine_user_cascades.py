@@ -25,7 +25,7 @@ def create_submission_index():
                                         r"New_Submissions\worldnews_subs_2022-01-01_2023-04-01")
     submissions_index = dict()
     for sub in all_submissions:
-        submissions_index["id"] = sub
+        submissions_index[sub["id"]] = sub
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
                       r"Indexes\submissions_index", submissions_index)
 
@@ -167,8 +167,11 @@ def print_with_phrase_colored(in_str):
 def group_opinion_changed_with_parent_child_comments():
     comments_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                                        r"Ukraine_War\Indexes\new_ukraine_comments_index")
+    submission_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+                                         r"Indexes\submissions_index")
     opinion_changed_comments = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
                                                  r"Ukraine_War\Annotations\new_kept_comments")
+    print()
     # populate with parent comments
     populated_with_parents = list()
     for comment_meta in opinion_changed_comments:
@@ -191,6 +194,18 @@ def group_opinion_changed_with_parent_child_comments():
                 comment_meta["comment_id"] = comment_id
                 comment_meta["is_child"] = True
                 comment_group.append(comment_meta)
+    print()
+    # populate with submissions
+    for comment_group in populated_with_parents:
+        for comment in comment_group:
+            parent_post_kind = comment["parent_id"][0:2]
+            parent_post_id = comment["parent_id"][3:]
+            if parent_post_kind == "t3":
+                # if parent_post_id in submission_index:
+                submission = submission_index[parent_post_id]
+                comment_group.append(submission)
+                break
+    print()
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
                       r"Annotations\new_populated_opinion_change_comments_with_parents_children_and_submission_post",
                       populated_with_parents)
@@ -198,12 +213,14 @@ def group_opinion_changed_with_parent_child_comments():
 
 def write_permalinks():
     comments = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                                 r"Ukraine_War\Annotations\kept_comments")
+                                 r"Ukraine_War\Annotations\new_kept_comments")
     with open(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-              r"Annotations\ukraine_permalinks.html", "w") as out_file:
+              r"Annotations\new_ukraine_permalinks.html", "w") as out_file:
+        out_file.write("<!DOCTYPE html>\n<html>\n<head>\n \t <base href=\"https://www.reddit.com/\"/>\n</head>\n<body>\n")
         for idx, comment in enumerate(comments):
             url = comment["permalink"]
-            out_file.write(str(idx) + " <a href=" + url + ">" + url + "</a><br>")
+            out_file.write(str(idx) + " <a href=" + url + ">" + url + "</a><br>\n")
+        out_file.write("</body>\n</html>")
 
 
 def merge_submissions():
@@ -217,14 +234,39 @@ def merge_submissions():
     tools.save_pickle(input_path + "worldnews_subs_2022-01-01_2023-04-01", all_submissions)
 
 
+def keep_checked_opinion_change_cooments():
+    ids_of_checked_comments = [0, 2, 3, 4, 6, 9, 10, 13, 16, 17, 19, 20, 22, 24, 25, 26, 28, 29, 30, 31, 34, 35, 36, 37,
+                               38, 39, 40, 41, 42, 51, 53, 54, 55, 56, 58, 63, 64, 65, 68, 73, 75, 76, 77, 78, 79, 80,
+                               81, 82, 84, 87, 89, 90, 91, 93, 94, 95, 96, 97, 102, 103, 104, 106, 109, 110, 112, 113,
+                               115, 116, 118, 119, 121, 124, 125, 126, 127, 128, 129, 132, 134, 135, 139, 140, 141, 142,
+                               143, 144, 146, 147, 148, 149, 150, 151, 153, 154, 155, 156, 158, 160, 162, 163, 164, 165,
+                               166, 168, 171, 174, 175, 176, 177, 178, 179, 180, 184, 185, 187, 189, 192, 194, 195, 197,
+                               198, 199, 204, 205, 207, 210, 211, 213, 216, 217, 218, 219, 220, 221, 222, 223, 228, 229,
+                               231, 232, 238, 239, 240, 241, 243, 245, 251, 253, 254, 255, 256, 257, 259, 260, 261, 263,
+                               264, 265, 266, 267, 268, 269, 271, 272, 273, 275, 276, 277, 278, 279, 282, 286, 287, 289,
+                               290, 291, 292, 294, 295, 296, 297, 302, 304, 307, 310, 314, 315, 316, 317, 319, 320, 322,
+                               323, 324, 326, 327, 328, 330, 331, 333, 335, 338, 339, 342, 345, 348, 350, 352, 354, 356,
+                               357, 360, 361, 367, 368, 370, 372, 376, 377, 378, 380, 381, 384, 387, 389, 397, 398, 400,
+                               401, 404, 405, 407, 410, 411, 412, 413, 414, 417, 419, 420, 422, 424, 425, 426, 428, 436,
+                               437, 438, 439, 440, 442, 443, 446, 447, 449, 450, 453, 454, 455, 456, 457, 458, 459, 460,
+                               464, 465, 466, 467, 470, 471, 472, 475, 477, 479, 482, 483, 484, 486, 487, 496, 497, 498,
+                               499, 500, 501, 502, 505, 506, 507, 508, 509, 510, 511, 512, 513, 515, 516, 517, 518, 519,
+                               520, 522, 524, 527, 528, 529, 530, 532, 533, 535, 536, 537, 538, 539, 542, 546, 547, 549,
+                               550, 552, 553, 555, 557, 558, 559, 560, 561, 562, 563, 567, 568, 569, 571, 573, 574, 576,
+                               578, 579, 580, 581, 582, 583, 584, 586, 587, 589, 590, 591, 592, 595, 596, 598, 599, 600,
+                               603, 605]
+
+
+
 if __name__ == "__main__":
     # create_comments_index()
     # create_submission_index()
     # merge_submissions()
     # scan_for_agreement_phrases()
     # annotate()
-    group_opinion_changed_with_parent_child_comments()
-    # write_permalinks()
-
+    # group_opinion_changed_with_parent_child_comments()
+    write_permalinks()
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\Annotations\\"
+    #                       r"new_populated_opinion_change_comments_with_parents_children_and_submission_post")
 
     print()
