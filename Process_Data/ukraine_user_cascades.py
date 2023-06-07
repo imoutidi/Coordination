@@ -234,7 +234,7 @@ def merge_submissions():
     tools.save_pickle(input_path + "worldnews_subs_2022-01-01_2023-04-01", all_submissions)
 
 
-def keep_checked_opinion_change_cooments():
+def keep_checked_opinion_change_comments():
     ids_of_checked_comments = [0, 2, 3, 4, 6, 9, 10, 13, 16, 17, 19, 20, 22, 24, 25, 26, 28, 29, 30, 31, 34, 35, 36, 37,
                                38, 39, 40, 41, 42, 51, 53, 54, 55, 56, 58, 63, 64, 65, 68, 73, 75, 76, 77, 78, 79, 80,
                                81, 82, 84, 87, 89, 90, 91, 93, 94, 95, 96, 97, 102, 103, 104, 106, 109, 110, 112, 113,
@@ -262,12 +262,14 @@ def keep_checked_opinion_change_cooments():
                                                r"Annotations\populated_opinion_change_comments_with_parents_children_and_submission_post")
     kept = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\Annotations\kept_comments")
     new_kept = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\Annotations\new_kept_comments")
-    opinion_change_kept = new_kept + kept
+    opinion_change_kept = list()
     populated_opinion_change = list()
     for idx in ids_of_checked_comments:
         populated_opinion_change.append(children_parents[idx])
+        opinion_change_kept.append(new_kept[idx])
     for comment_group in children_parents_small:
         populated_opinion_change.append(comment_group)
+    opinion_change_kept += kept
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\Annotations\\"
                       r"For_Opinion_Change_Dataset\populated_opinion_change_ukraine", populated_opinion_change)
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\Annotations\\"
@@ -282,8 +284,8 @@ if __name__ == "__main__":
     # annotate()
     # group_opinion_changed_with_parent_child_comments()
     write_permalinks()
-    # keep_checked_opinion_change_cooments()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\Annotations\\"
-    #                       r"new_populated_opinion_change_comments_with_parents_children_and_submission_post")
+    # keep_checked_opinion_change_comments()
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\Annotations\\"
+    #                       r"populated_opinion_change_comments_with_parents_and_submission_post")
 
     print()
