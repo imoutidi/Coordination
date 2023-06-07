@@ -212,10 +212,10 @@ def group_opinion_changed_with_parent_child_comments():
 
 
 def write_permalinks():
-    comments = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                                 r"Ukraine_War\Annotations\new_kept_comments")
+    comments = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\Annotations\\"
+                                 r"For_Opinion_Change_Dataset\only_the_opinion_change_comment")
     with open(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-              r"Annotations\new_ukraine_permalinks.html", "w") as out_file:
+              r"Annotations\For_Opinion_Change_Dataset\opinion_change_permalinks.html", "w") as out_file:
         out_file.write("<!DOCTYPE html>\n<html>\n<head>\n \t <base href=\"https://www.reddit.com/\"/>\n</head>\n<body>\n")
         for idx, comment in enumerate(comments):
             url = comment["permalink"]
@@ -256,7 +256,22 @@ def keep_checked_opinion_change_cooments():
                                578, 579, 580, 581, 582, 583, 584, 586, 587, 589, 590, 591, 592, 595, 596, 598, 599, 600,
                                603, 605, 606, 610, 611, 612, 615, 616, 618, 619, 620, 621, 624, 627, 629, 631, 634, 636,
                                638, 639, 644]
-
+    children_parents = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+                                         r"Annotations\new_populated_opinion_change_comments_with_parents_children_and_submission_post")
+    children_parents_small = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+                                               r"Annotations\populated_opinion_change_comments_with_parents_children_and_submission_post")
+    kept = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\Annotations\kept_comments")
+    new_kept = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\Annotations\new_kept_comments")
+    opinion_change_kept = new_kept + kept
+    populated_opinion_change = list()
+    for idx in ids_of_checked_comments:
+        populated_opinion_change.append(children_parents[idx])
+    for comment_group in children_parents_small:
+        populated_opinion_change.append(comment_group)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\Annotations\\"
+                      r"For_Opinion_Change_Dataset\populated_opinion_change_ukraine", populated_opinion_change)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\Annotations\\"
+                      r"For_Opinion_Change_Dataset\only_the_opinion_change_comment", opinion_change_kept)
 
 
 if __name__ == "__main__":
@@ -267,6 +282,7 @@ if __name__ == "__main__":
     # annotate()
     # group_opinion_changed_with_parent_child_comments()
     write_permalinks()
+    # keep_checked_opinion_change_cooments()
     # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\Annotations\\"
     #                       r"new_populated_opinion_change_comments_with_parents_children_and_submission_post")
 

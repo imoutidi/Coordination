@@ -1,0 +1,4 @@
+The only_the_opinion_change_comment is a pickle file containing comments where the author changed his opinion
+The populated_opinion_change_ukraine is a pickle file containing the previous comments populated with their parent and
+children comments as well the submission post.
+The opinion_change_permalink.html file contains links to the actual comments on Reddit.
