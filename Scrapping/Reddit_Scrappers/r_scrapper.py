@@ -10,8 +10,7 @@ from Tool_Pack import tools
 from prawcore.exceptions import Forbidden
 
 
-reddit = praw.Reddit(client_id="JA5vOF4gOhcjuGqdHU2Gcw", client_secret="3XT735o7Yc5dPql4EG9ThcqVgzrPZw",
-                     user_agent="Climate_Change")
+
 
 def getPushshiftData():
     url = " https://api.pushshift.io/reddit/search/submission/?limit=1000&q=trump&after=1514764800&before=1517443200&subreddit=politics"
