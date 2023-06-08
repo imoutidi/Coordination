@@ -6,9 +6,6 @@ import requests
 import os
 from Tool_Pack import tools
 
-bearer_t = r"AAAAAAAAAAAAAAAAAAAAANyPlgEAAAAAmVIpLSdEJ7y%2BEAgVSQPhUWZGCMg%3DSxrSVwKKjFc2ODviHRybJBzHn" \
-           r"VMlcN2JZPPIkB5OLuYFPqE5Sy"
-out_path = "/home/iraklis/PycharmProjects/Crypto_Monitor/I_O/Stream_Batches/"
 
 
 def bearer_oauth(r):
