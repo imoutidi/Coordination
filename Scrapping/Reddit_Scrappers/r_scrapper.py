@@ -64,6 +64,7 @@ def get_submissions_records_for_time_range(start_date_str, end_date_str, subredd
 
         # Send a GET request to the API endpoint
         response = requests.get(url)
+        print()
 
         # Extract the ids of the submissions from the response JSON
         # submission_ids += [submission["id"] for submission in response.json()["data"]]
@@ -131,13 +132,76 @@ def get_submissions_records_for_time_range(start_date_str, end_date_str, subredd
         print(earlier_date)
         earlier_date = later_date
         later_date += relativedelta(hours=hour_interval)
-    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\New_Submissions\\"
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\New_Submissions\\"
                       + subreddit_name + "_" + start_date_str + "_" + end_date_str, submission_records)
 
 
 def date_converter(date_obj):
     timestamp = int(time.mktime(date_obj.timetuple()))
     return timestamp
+
+
+def get_submissions_with_praw():
+    subreddit_name = "cryptocurrency"
+    time_period = "year"
+    subreddit = reddit.subreddit(subreddit_name)
+    submissions = subreddit.top(time_filter=time_period, limit=None)
+    submission_records = list()
+    counter = 0
+    for submission in submissions:
+        time.sleep(0.1)
+        fields_dict = dict()
+        if hasattr(submission, "author"):
+            fields_dict["author"] = submission.author
+        else:
+            fields_dict["author"] = "N_A"
+        if hasattr(submission, "author_fullname"):
+            fields_dict["author_fullname"] = submission.author_fullname
+        else:
+            fields_dict["author_fullname"] = "N_A"
+        if hasattr(submission, "id"):
+            fields_dict["id"] = submission.id
+        else:
+            fields_dict["id"] = "N_A"
+        if hasattr(submission, "permalink"):
+            fields_dict["permalink"] = submission.permalink
+        else:
+            fields_dict["permalink"] = "N_A"
+        if hasattr(submission, "retrieved_utc"):
+            fields_dict["retrieved_utc"] = submission.retrieved_utc
+        else:
+            fields_dict["retrieved_utc"] = "N_A"
+        if hasattr(submission, "score"):
+            fields_dict["score"] = submission.score
+        else:
+            fields_dict["score"] = "N_A"
+        if hasattr(submission, "selftext"):
+            fields_dict["selftext"] = submission.selftext
+        else:
+            fields_dict["selftext"] = "N_A"
+        if hasattr(submission, "subreddit"):
+            fields_dict["subreddit"] = submission.subreddit
+        else:
+            fields_dict["subreddit"] = "N_A"
+        if hasattr(submission, "title"):
+            fields_dict["title"] = submission.title
+        else:
+            fields_dict["title"] = "N_A"
+        if hasattr(submission, "url"):
+            fields_dict["url"] = submission.url
+        else:
+            fields_dict["url"] = "N_A"
+        if hasattr(submission, "utc_datetime_str"):
+            fields_dict["utc_datetime_str"] = submission.utc_datetime_str
+        else:
+            fields_dict["utc_datetime_str"] = "N_A"
+        submission_records.append(fields_dict)
+        if counter % 1000 == 0 and counter != 0:
+            print(counter)
+            tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                              r"New_Submissions\\" + str(counter) + "_submissions", submission_records)
+            submission_records = list()
+        counter += 1
 
 
 def retrieve_comments_ids_per_submission():
@@ -226,8 +290,9 @@ def retrieve_comments_ids_per_submission():
 if __name__ == "__main__":
     # getPushshiftData()
     # get_post_with_id()
-    # get_submissions_records_for_time_range("2023-01-01", "2023-04-01", "worldnews", "ukraine+russia")
-    retrieve_comments_ids_per_submission()
+    # get_submissions_records_for_time_range("2022-06-07", "2023-06-07", "CryptoCurrency")
+    get_submissions_with_praw()
+    # retrieve_comments_ids_per_submission()
     # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\New_Submissions\worldnews_2022-01-01_2022-05-01")
     # b = get_post_with_id("119wltg")
     print()
