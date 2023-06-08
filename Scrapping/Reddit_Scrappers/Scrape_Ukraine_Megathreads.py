@@ -11,8 +11,7 @@ from prawcore.exceptions import Forbidden
 import r_scrapper
 
 
-reddit = praw.Reddit(client_id="JA5vOF4gOhcjuGqdHU2Gcw", client_secret="3XT735o7Yc5dPql4EG9ThcqVgzrPZw",
-                     user_agent="Climate_Change")
+
 
 
 def crawl_megathreads(start_post_id="12aw2q2"):
