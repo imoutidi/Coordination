@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import requests
 import json
@@ -8,6 +9,7 @@ import praw
 from dateutil.relativedelta import relativedelta
 from Tool_Pack import tools
 from prawcore.exceptions import Forbidden
+
 
 
 
@@ -147,7 +149,7 @@ def get_submissions_with_praw():
     submission_records = list()
     counter = 0
     for submission in submissions:
-        time.sleep(0.1)
+        # time.sleep(0.1)
         fields_dict = dict()
         if hasattr(submission, "author"):
             fields_dict["author"] = submission.author
@@ -194,11 +196,11 @@ def get_submissions_with_praw():
         else:
             fields_dict["utc_datetime_str"] = "N_A"
         submission_records.append(fields_dict)
-        if counter % 1000 == 0 and counter != 0:
-            print(counter)
+        if counter % 10 == 0 and counter != 0:
             tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
                               r"New_Submissions\\" + str(counter) + "_submissions", submission_records)
             submission_records = list()
+        print(counter)
         counter += 1
 
 
@@ -285,13 +287,31 @@ def retrieve_comments_ids_per_submission():
     #     print()
 
 
+def merge_crypto_submissions():
+    input_path = r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\New_Submissions\\"
+    merged_submissions = list()
+    for filename in os.listdir(input_path):
+        submissions = tools.load_pickle(input_path + filename)
+        for sub in submissions:
+            merged_submissions.append(sub)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                      r"New_Submissions\\All_submissions2", merged_submissions)
+
+
+def compare_submission_ids():
+    sub_set_1 = set()
+    sub_set_2 = set()
+    result_set = sub_set_1.intersection(sub_set_2)
+
+
 if __name__ == "__main__":
     # getPushshiftData()
     # get_post_with_id()
     # get_submissions_records_for_time_range("2022-06-07", "2023-06-07", "CryptoCurrency")
     get_submissions_with_praw()
     # retrieve_comments_ids_per_submission()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\New_Submissions\worldnews_2022-01-01_2022-05-01")
+    # merge_crypto_submissions()
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\New_Submissions\All_submissions")
     # b = get_post_with_id("119wltg")
     print()
 
