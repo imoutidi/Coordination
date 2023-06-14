@@ -1,17 +1,8 @@
 from Tool_Pack import tools
 from pymongo import MongoClient, ASCENDING, errors
-import tweepy
-# import editdistance
-# print(editdistance.eval('one banana', 'banana one'))
 import os
 import re
 from collections import defaultdict
-import pprint
-import nltk
-# nltk.download('stopwords')  # download stopwords corpus
-# nltk.download('punkt')  # download punkt tokenizer
-# nltk.download('wordnet')  # download WordNet lemmatizer
-
 import numpy as np
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
@@ -20,7 +11,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 import torch
 from transformers import BertTokenizer, BertModel
-
 
 
 class TweetArchiver:

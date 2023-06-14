@@ -11,7 +11,8 @@ from Tool_Pack import tools
 from prawcore.exceptions import Forbidden
 
 
-
+reddit = praw.Reddit(client_id="JA5vOF4gOhcjuGqdHU2Gcw", client_secret="3XT735o7Yc5dPql4EG9ThcqVgzrPZw",
+                     user_agent="Climate_Change")
 
 def getPushshiftData():
     url = " https://api.pushshift.io/reddit/search/submission/?limit=1000&q=trump&after=1514764800&before=1517443200&subreddit=politics"
@@ -142,7 +143,7 @@ def date_converter(date_obj):
 
 
 def get_submissions_with_praw():
-    subreddit_name = "cryptocurrency"
+    subreddit_name = "ethtrader"
     time_period = "year"
     subreddit = reddit.subreddit(subreddit_name)
     submissions = subreddit.top(time_filter=time_period, limit=None)
@@ -196,21 +197,23 @@ def get_submissions_with_praw():
         else:
             fields_dict["utc_datetime_str"] = "N_A"
         submission_records.append(fields_dict)
-        if counter % 10 == 0 and counter != 0:
+        if counter % 20 == 0 and counter != 0:
             tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
-                              r"New_Submissions\\" + str(counter) + "_submissions", submission_records)
+                              r"New_Submissions\\" + str(counter) + "_ethtrader_submissions", submission_records)
             submission_records = list()
         print(counter)
         counter += 1
 
 
 def retrieve_comments_ids_per_submission():
-    period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-                                       r"New_Submissions\worldnews_2022-01-01_2022-05-01")
+    # period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+    #                                    r"New_Submissions\worldnews_2022-01-01_2022-05-01")
     # period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Twitter_Parser\I_O\\"
     #                                    r"Politics\January_6_United_States_Capitol_attack\submission_records")
     # period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\\"
     #                                    r"r_science_submission_records")
+    period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                                       r"New_Submissions\All_btc_submissions")
 
     # TODO change that to zero when starting the scraper
     idx_correction = 0
@@ -271,9 +274,9 @@ def retrieve_comments_ids_per_submission():
                 comment_record_dict["parent_id"] = "N_A"
             comment_list.append(comment_record_dict)
         submission_id_to_comments_dict[sub_record["id"]] = comment_list
-        time.sleep(4)
-    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-                              r"Comments\New_Comments\comments_2022-05-01_last", submission_id_to_comments_dict)
+        time.sleep(3)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                      r"Comments\btc_comments", submission_id_to_comments_dict)
 
     # ///////////////////////////////////////////////////////////
     # pushshift comment_ids is broken at the moment
@@ -291,27 +294,23 @@ def merge_crypto_submissions():
     input_path = r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\New_Submissions\\"
     merged_submissions = list()
     for filename in os.listdir(input_path):
-        submissions = tools.load_pickle(input_path + filename)
-        for sub in submissions:
-            merged_submissions.append(sub)
+        if "ethtrader" in filename:
+            print(filename)
+            submissions = tools.load_pickle(input_path + filename)
+            for sub in submissions:
+                merged_submissions.append(sub)
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
-                      r"New_Submissions\\All_submissions2", merged_submissions)
-
-
-def compare_submission_ids():
-    sub_set_1 = set()
-    sub_set_2 = set()
-    result_set = sub_set_1.intersection(sub_set_2)
+                      r"New_Submissions\\All_ethtrader_submissions", merged_submissions)
 
 
 if __name__ == "__main__":
     # getPushshiftData()
     # get_post_with_id()
     # get_submissions_records_for_time_range("2022-06-07", "2023-06-07", "CryptoCurrency")
-    get_submissions_with_praw()
-    # retrieve_comments_ids_per_submission()
+    # get_submissions_with_praw()
+    retrieve_comments_ids_per_submission()
     # merge_crypto_submissions()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\New_Submissions\All_submissions")
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\New_Submissions\All_ethtrader_submissions")
     # b = get_post_with_id("119wltg")
     print()
 

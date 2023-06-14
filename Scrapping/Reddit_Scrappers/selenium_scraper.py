@@ -1,6 +1,7 @@
 import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from Tool_Pack import tools
 
 def scrape_subs():
     # Set up Selenium WebDriver
@@ -35,4 +36,7 @@ def scrape_subs():
 
 
 if __name__ == "__main__":
-    scrape_subs()
+    # scrape_subs()
+    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\New_Submissions\20_btc_submissions")
+    b = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\New_Submissions\20_btc2_submissions")
+    print()

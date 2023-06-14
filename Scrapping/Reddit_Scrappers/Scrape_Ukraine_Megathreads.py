@@ -11,7 +11,8 @@ from prawcore.exceptions import Forbidden
 import r_scrapper
 
 
-
+reddit = praw.Reddit(client_id="JA5vOF4gOhcjuGqdHU2Gcw", client_secret="3XT735o7Yc5dPql4EG9ThcqVgzrPZw",
+                     user_agent="Climate_Change")
 
 
 def crawl_megathreads(start_post_id="12aw2q2"):
@@ -48,5 +49,5 @@ if __name__ == "__main__":
     # tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
     #                           r"Ukraine_War\all_megathreads_post_ids_temp", a)
     # crawl_megathreads(start_post_id="uwm88b")
-    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\all_megathreads_post_ids")
+    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\New_Submissions\20_submissions")
     print()
