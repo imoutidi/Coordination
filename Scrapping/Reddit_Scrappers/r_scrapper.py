@@ -11,8 +11,6 @@ from Tool_Pack import tools
 from prawcore.exceptions import Forbidden
 
 
-reddit = praw.Reddit(client_id="JA5vOF4gOhcjuGqdHU2Gcw", client_secret="3XT735o7Yc5dPql4EG9ThcqVgzrPZw",
-                     user_agent="Climate_Change")
 
 def getPushshiftData():
     url = " https://api.pushshift.io/reddit/search/submission/?limit=1000&q=trump&after=1514764800&before=1517443200&subreddit=politics"
@@ -41,7 +39,7 @@ def get_post_with_id(post_id="125udaj"):
     return post
 
 
-# Getting submission ids for 6 hour time interval for a given date range
+# Getting submission ids for 6 hour time interval for a given date range using the pushshift API.
 def get_submissions_records_for_time_range(start_date_str, end_date_str, subreddit_name, query=None):
     hour_interval = 3
     start_date_obj = datetime.datetime.strptime(start_date_str, "%Y-%m-%d")
@@ -143,7 +141,8 @@ def date_converter(date_obj):
 
 
 def get_submissions_with_praw():
-    subreddit_name = "ethtrader"
+    climate_buzwords = ["climate", "global warming", "climate change", "emissions", "co2"]
+    subreddit_name = "askscience"
     time_period = "year"
     subreddit = reddit.subreddit(subreddit_name)
     submissions = subreddit.top(time_filter=time_period, limit=None)
@@ -152,6 +151,27 @@ def get_submissions_with_praw():
     for submission in submissions:
         # time.sleep(0.1)
         fields_dict = dict()
+        climate_flag = False
+        if hasattr(submission, "title"):
+            for b_word in climate_buzwords:
+                if b_word in submission.title:
+                    # print("Found climate related in title.")
+                    fields_dict["title"] = submission.title
+                    climate_flag = True
+                    break
+        else:
+            fields_dict["title"] = "N_A"
+        if hasattr(submission, "selftext"):
+            for b_word in climate_buzwords:
+                if b_word in submission.selftext or climate_flag:
+                    # print("Found climate related in self text.")
+                    fields_dict["selftext"] = submission.selftext
+                    climate_flag = True
+                    break
+        else:
+            fields_dict["selftext"] = "N_A"
+        if not climate_flag:
+            continue
         if hasattr(submission, "author"):
             fields_dict["author"] = submission.author
         else:
@@ -176,18 +196,10 @@ def get_submissions_with_praw():
             fields_dict["score"] = submission.score
         else:
             fields_dict["score"] = "N_A"
-        if hasattr(submission, "selftext"):
-            fields_dict["selftext"] = submission.selftext
-        else:
-            fields_dict["selftext"] = "N_A"
         if hasattr(submission, "subreddit"):
             fields_dict["subreddit"] = submission.subreddit
         else:
             fields_dict["subreddit"] = "N_A"
-        if hasattr(submission, "title"):
-            fields_dict["title"] = submission.title
-        else:
-            fields_dict["title"] = "N_A"
         if hasattr(submission, "url"):
             fields_dict["url"] = submission.url
         else:
@@ -198,14 +210,14 @@ def get_submissions_with_praw():
             fields_dict["utc_datetime_str"] = "N_A"
         submission_records.append(fields_dict)
         if counter % 20 == 0 and counter != 0:
-            tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
-                              r"New_Submissions\\" + str(counter) + "_ethtrader_submissions", submission_records)
+            tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Climate_Change\\"
+                              r"New_Submissions\\" + str(counter) + "_climate_change_submissions", submission_records)
             submission_records = list()
         print(counter)
         counter += 1
 
 
-def retrieve_comments_ids_per_submission():
+def retrieve_comments_ids_per_submission(contex_subreddit):
     # period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
     #                                    r"New_Submissions\worldnews_2022-01-01_2022-05-01")
     # period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Twitter_Parser\I_O\\"
@@ -213,16 +225,17 @@ def retrieve_comments_ids_per_submission():
     # period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\\"
     #                                    r"r_science_submission_records")
     period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
-                                       r"New_Submissions\All_btc_submissions")
+                                       r"New_Submissions\All_" + contex_subreddit + "_submissions")
 
     # TODO change that to zero when starting the scraper
     idx_correction = 0
     submission_id_to_comments_dict = dict()
     for idx, sub_record in enumerate(period_records[idx_correction:]):
-        if (idx + idx_correction) % 1000 == 0:
+        print(idx)
+        if (idx + idx_correction) % 100 == 0:
             print("Saved until idx:" + str(idx + idx_correction))
-            tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-                              r"Comments\New_Comments\comments_2022-05-01_"
+            tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                              r"Comments\\" + contex_subreddit + "_comments_"
                               + str(idx + idx_correction), submission_id_to_comments_dict)
             submission_id_to_comments_dict = dict()
         comment_list = list()
@@ -233,8 +246,6 @@ def retrieve_comments_ids_per_submission():
             print(f_error)
         # submission.comments.replace_more(limit=None, threshold=0)
         for comment in submission.comments.list():
-            # for reply in comment.replies.list():
-            #     print()
             comment_record_dict = dict()
             if "id" in comment.__dict__:
                 comment_record_dict["id"] = comment.__dict__["id"]
@@ -274,9 +285,10 @@ def retrieve_comments_ids_per_submission():
                 comment_record_dict["parent_id"] = "N_A"
             comment_list.append(comment_record_dict)
         submission_id_to_comments_dict[sub_record["id"]] = comment_list
-        time.sleep(3)
+        time.sleep(2)
+    # Here all comments should be gathered.
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
-                      r"Comments\btc_comments", submission_id_to_comments_dict)
+                      r"Comments\remaining_" + contex_subreddit + "_comments", submission_id_to_comments_dict)
 
     # ///////////////////////////////////////////////////////////
     # pushshift comment_ids is broken at the moment
@@ -308,9 +320,9 @@ if __name__ == "__main__":
     # get_post_with_id()
     # get_submissions_records_for_time_range("2022-06-07", "2023-06-07", "CryptoCurrency")
     # get_submissions_with_praw()
-    retrieve_comments_ids_per_submission()
+    retrieve_comments_ids_per_submission("ethtrader")
     # merge_crypto_submissions()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\New_Submissions\All_ethtrader_submissions")
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Comments\btc_comments_900")
     # b = get_post_with_id("119wltg")
     print()
 
