@@ -81,16 +81,17 @@ def scan_for_agreement_phrases():
                              "ok got it", "got it", "i get it", "amen to that", "i see your point", "my bad",
                              "i am wrong", "i'm wrong", "i was wrong", "i went wrong", "you’re correct",
                              "you are correct", "i stand corrected"]
-    all_comments = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                                     r"Ukraine_War\Indexes\new_ukraine_comments_index")
-    for comment_id, comment_attrs in all_comments.items():
-        post_text = comment_attrs["body"].lower().replace("\n", "").strip()
-        for agree_phrase in agreement_key_phrases:
-            if agree_phrase in post_text:
-                comment_attrs["comment_id"] = comment_id
-                key_phrase_to_opinion_comment[agree_phrase].append(comment_attrs)
-    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                      r"Ukraine_War\Comments\New_Comments\agree_key_phrases", key_phrase_to_opinion_comment)
+    all_comments = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                                     r"Comments\all_comments")
+    for submission_id, comment_attrs in all_comments.items():
+        for comment in comment_attrs:
+            post_text = comment["body"].lower().replace("\n", "").strip()
+            for agree_phrase in agreement_key_phrases:
+                if agree_phrase in post_text:
+                    comment["submission_id"] = submission_id
+                    key_phrase_to_opinion_comment[agree_phrase].append(comment_attrs)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Comments\\"
+                      r"agree_comments", key_phrase_to_opinion_comment)
 
 
 def annotate():
@@ -283,9 +284,8 @@ if __name__ == "__main__":
     # scan_for_agreement_phrases()
     # annotate()
     # group_opinion_changed_with_parent_child_comments()
-    write_permalinks()
+    # write_permalinks()
     # keep_checked_opinion_change_comments()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Storm_on_capitol\Annotations\\"
-    #                       r"populated_opinion_change_comments_with_parents_and_submission_post")
+    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Comments\agree_comments")
 
     print()
