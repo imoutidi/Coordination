@@ -89,31 +89,36 @@ def scan_for_agreement_phrases():
             for agree_phrase in agreement_key_phrases:
                 if agree_phrase in post_text:
                     comment["submission_id"] = submission_id
-                    key_phrase_to_opinion_comment[agree_phrase].append(comment_attrs)
+                    key_phrase_to_opinion_comment[agree_phrase].append(comment)
     tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Comments\\"
                       r"agree_comments", key_phrase_to_opinion_comment)
 
 
 def annotate():
-    comment_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                                      r"Ukraine_War\Annotations\new_comment_number")
+    # Load the index of the comment when we stopped last time
+    comment_index = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                                      r"Annotations\crypto_comment_number")
+
+    # The first time use this line.
     # comment_index = 0
     index_counter = 0
 
-    comments_to_keep = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                                         r"Ukraine_War\Annotations\new_kept_comments")
+    # comments_to_keep = list()
+    comments_to_keep = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                                         r"Annotations\crypto_kept_comments")
     comments_with_agree_keyphrase = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                                                      r"Ukraine_War\Comments\New_Comments\agree_key_phrases")
+                                                      r"Crypto_Currency\Comments\agree_comments")
     # comments_to_keep = list()
     merged_comment_list = list()
     for keyphrase, comment_list in comments_with_agree_keyphrase.items():
+        print()
         merged_comment_list += comment_list
 
     for comment in merged_comment_list[comment_index:]:
         print(comment_index + index_counter)
         index_counter += 1
-        if "i agree" in comment["body"].lower():
-            continue
+        # if "i agree" in comment["body"].lower():
+        #     continue
         print_with_phrase_colored(comment["body"])
         # print(comment["body"])
         answer = input("Keep this comment?")
@@ -122,10 +127,10 @@ def annotate():
         if answer == "STOP":
             break
 
-    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                      r"Ukraine_War\Annotations\new_kept_comments", comments_to_keep)
-    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\\"
-                      r"Ukraine_War\Annotations\new_comment_number", comment_index + index_counter - 1)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                      r"Annotations\crypto_kept_comments", comments_to_keep)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                      r"Annotations\crypto_comment_number", comment_index + index_counter - 1)
 
 
 def print_with_phrase_colored(in_str):
@@ -282,10 +287,10 @@ if __name__ == "__main__":
     # create_submission_index()
     # merge_submissions()
     # scan_for_agreement_phrases()
-    # annotate()
+    annotate()
     # group_opinion_changed_with_parent_child_comments()
     # write_permalinks()
     # keep_checked_opinion_change_comments()
-    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Comments\agree_comments")
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Annotations\crypto_kept_comments")
 
     print()
