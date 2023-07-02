@@ -11,6 +11,9 @@ from Tool_Pack import tools
 from prawcore.exceptions import Forbidden
 
 
+reddit = praw.Reddit(client_id=os.environ.get("client_id"), client_secret=os.environ.get("client_secret"),
+                     user_agent=os.environ.get("user_agent"))
+
 
 def getPushshiftData():
     url = " https://api.pushshift.io/reddit/search/submission/?limit=1000&q=trump&after=1514764800&before=1517443200&subreddit=politics"
@@ -222,8 +225,6 @@ def retrieve_comments_ids_per_submission(contex_subreddit):
     #                                    r"New_Submissions\worldnews_2022-01-01_2022-05-01")
     # period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Twitter_Parser\I_O\\"
     #                                    r"Politics\January_6_United_States_Capitol_attack\submission_records")
-    # period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Covid\\"
-    #                                    r"r_science_submission_records")
     period_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
                                        r"New_Submissions\All_" + contex_subreddit + "_submissions")
 
@@ -315,14 +316,30 @@ def merge_crypto_submissions():
                       r"New_Submissions\\All_ethtrader_submissions", merged_submissions)
 
 
+def merge_comments(context_subreddit):
+    input_path = r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Comments\\"
+    merged_comments = dict()
+    for filename in os.listdir(input_path):
+        if context_subreddit in filename:
+            print(filename)
+            comments = tools.load_pickle(input_path + filename)
+            for submission_id, submisison_comments in comments.items():
+                if len(submisison_comments) == 0:
+                    continue
+                merged_comments[submission_id] = submisison_comments
+    tools.save_pickle(input_path + context_subreddit + r"_comments", merged_comments)
+
+
 if __name__ == "__main__":
     # getPushshiftData()
     # get_post_with_id()
     # get_submissions_records_for_time_range("2022-06-07", "2023-06-07", "CryptoCurrency")
     # get_submissions_with_praw()
-    retrieve_comments_ids_per_submission("ethtrader")
+    # retrieve_comments_ids_per_submission("ethtrader")
     # merge_crypto_submissions()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Comments\btc_comments_900")
+    # merge_comments("all")
+    a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                          r"Comments\all_comments")
     # b = get_post_with_id("119wltg")
     print()
 
