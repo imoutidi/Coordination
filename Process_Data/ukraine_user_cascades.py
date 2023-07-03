@@ -292,5 +292,7 @@ if __name__ == "__main__":
     # write_permalinks()
     # keep_checked_opinion_change_comments()
     # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Annotations\crypto_kept_comments")
+    # b = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Annotations\crypto_comment_number")
+
 
     print()
