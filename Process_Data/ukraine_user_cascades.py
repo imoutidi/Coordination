@@ -285,7 +285,7 @@ def keep_checked_opinion_change_comments():
 if __name__ == "__main__":
     # create_comments_index()
     # create_submission_index()
-    # merge_submissions()
+    # merge_submissnions()
     # scan_for_agreement_phrases()
     annotate()
     # group_opinion_changed_with_parent_child_comments()
@@ -293,6 +293,5 @@ if __name__ == "__main__":
     # keep_checked_opinion_change_comments()
     # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Annotations\crypto_kept_comments")
     # b = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Annotations\crypto_comment_number")
-
 
     print()
