@@ -287,7 +287,7 @@ if __name__ == "__main__":
     # create_submission_index()
     # merge_submissnions()
     # scan_for_agreement_phrases()
-    annotate()
+    # annotate()
     # group_opinion_changed_with_parent_child_comments()
     # write_permalinks()
     # keep_checked_opinion_change_comments()
