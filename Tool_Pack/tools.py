@@ -58,7 +58,7 @@ def save_pickle(path, data_structure):
 
 
 def load_pickle(path):
-n    load_ds = open(path, "rb")
+    load_ds = open(path, "rb")
     data_structure = pickle.load(load_ds)
     load_ds.close()
     return data_structure
