@@ -22,19 +22,19 @@ from colorama import Style
 
 def create_submission_index():
 
-    all_submissions = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-                                        r"New_Submissions\worldnews_subs_2022-01-01_2023-04-01")
+    all_submissions = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                                        r"New_Submissions\merged_submissions")
     submissions_index = dict()
     for sub in all_submissions:
         submissions_index[sub["id"]] = sub
-    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
                       r"Indexes\submissions_index", submissions_index)
 
 
 def create_comments_index():
     comments_dict = dict()
-    all_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-                                    r"New_Comments\worldnews_2022-01-01_2023-04-01")
+    all_records = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                                    r"New_Submissions\merged_submissions")
 
     for current_record, submission_comments in all_records.items():
         sid = current_record
@@ -70,8 +70,8 @@ def create_comments_index():
                                "body": c_body, "subreddit": c_subreddit, "timestamp": c_timestamp,
                                "score": c_score, "parent_id": c_parent_id, "permalink": c_perma}
             comments_dict[c_sid] = c_snapshot_dict
-    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Ukraine_War\\"
-                      r"Indexes\new_ukraine_comments_index", comments_dict)
+    tools.save_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\\"
+                      r"Indexes\comments_index", comments_dict)
 
 
 def scan_for_agreement_phrases():
@@ -284,16 +284,15 @@ def keep_checked_opinion_change_comments():
 
 
 if __name__ == "__main__":
-    # create_comments_index()
-    # create_submission_index()
+    create_comments_index()
+    create_submission_index()
     # merge_submissnions()
     # scan_for_agreement_phrases()
-    annotate()
+    # annotate()
     # group_on
     # pinion_changed_with_parent_child_comments()
     # write_permalinks()
     # keep_checked_opinion_change_comments()
-    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Annotations\crypto_kept_comments")
-    # b = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Annotations\crypto_comment_number")
-
+    # a = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Comments\all_comments")
+    # b = tools.load_pickle(r"C:\Users\irmo\PycharmProjects\Coordination\I_O\Datasets\Crypto_Currency\Annotations\crypto_kept_comments")
     print()
